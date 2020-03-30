@@ -50,12 +50,13 @@ class Sprite: #Classe pour définir les attributs d'un sprite rapidement
         self.back  = False
         self.right = False
         self.left  = False
+        self.walk  = False
         self.dialogue = False
         self.commande = True
         self.animation = False
         
    
-    def walking(self,screen,positionX,positionY,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops): #frame à l'image quand il marche sur la carte
+    def standing(self,screen,positionX,positionY,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops): #frame à l'image quand il marche sur la carte
         global frameP,nP
             
        
@@ -98,6 +99,47 @@ class Sprite: #Classe pour définir les attributs d'un sprite rapidement
                 screen.blit(leftpops[frameP], (positionX,positionY)) 
             else:
                 screen.blit(Wleftpops[frameP], (positionX,positionY))
+                if nP == 208:
+                    nP = 0
+    
+    def walking(self, screen, positionX, positionY, Rfrontpops, Rbackpops, Rrightpops, Rleftpops, RWfrontpops, RWrightpops, RWleftpops):
+        global nP, frameP
+        nP = nP % 216 # toutes les 208 frames
+            
+        if nP%54 < 9:
+            frameP = 0
+        elif nP%54 >= 9 and nP%54 < 17:
+            frameP = 1
+        elif nP%54 >= 18 and nP%54 < 26:
+            frameP = 2
+        elif nP%54 >= 27 and nP%54 < 35:
+            frameP = 3
+        elif nP%54 >= 36 and nP%54 < 44:
+            frameP = 4
+        elif nP%54 >= 45 and nP%54 < 53:
+            frameP = 5
+        nP += 1
+        
+        if self.front:
+            if nP <= 156:
+                screen.blit(Rfrontpops[frameP], (positionX,positionY))
+            else:
+                screen.blit(RWfrontpops[frameP], (positionX,positionY))
+            
+        elif self.right:
+            if nP <= 156:
+                screen.blit(Rrightpops[frameP], (positionX,positionY))
+            else:
+                screen.blit(RWrightpops[frameP], (positionX,positionY))
+            
+        elif self.back:    
+            screen.blit(Rbackpops[frameP], (positionX,positionY))
+        
+        elif self.left:
+            if nP <= 156:
+                screen.blit(Rleftpops[frameP], (positionX,positionY)) 
+            else:
+                screen.blit(RWleftpops[frameP], (positionX,positionY))
                 if nP == 208:
                     nP = 0
         

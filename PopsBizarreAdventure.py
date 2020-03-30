@@ -28,6 +28,8 @@ def main():
     
     initialPosX = 700
     initialPosY = 700
+    ancienPosX = initialPosX
+    ancienPosY = initialPosY
     widthPops   = 90
     heightPops  = 201
     velPops     = 5
@@ -44,21 +46,42 @@ def main():
     Wfrontpops  = []
     Wrightpops  = []
     Wleftpops   = []
+    Rfrontpops   = []
+    Rbackpops    = [] 
+    Rrightpops   = []
+    Rleftpops    = []
+    RWfrontpops   = [] 
+    RWrightpops   = []
+    RWleftpops    = []
     for i in range(6):
        
-        frontpops.append(loading("images/sprite_walking/front/normal/front{}.png".format(i+1)).convert_alpha())
+        frontpops.append(loading("images/sprite_standing/front/normal/front{}.png".format(i+1)).convert_alpha())
         
-        backpops.append(loading("images/sprite_walking/back/back{}.png".format(i+1)).convert_alpha())
+        backpops.append(loading("images/sprite_standing/back/back{}.png".format(i+1)).convert_alpha())
         
-        rightpops.append(loading("images/sprite_walking/right/normal/right{}.png".format(i+1)).convert_alpha())
+        rightpops.append(loading("images/sprite_standing/right/normal/right{}.png".format(i+1)).convert_alpha())
         
-        leftpops.append(loading("images/sprite_walking/left/normal/left{}.png".format(i+1)).convert_alpha())
+        leftpops.append(loading("images/sprite_standing/left/normal/left{}.png".format(i+1)).convert_alpha())
         
-        Wfrontpops.append(loading("images/sprite_walking/front/wink/front{}.png".format(i+1)).convert_alpha())
+        Wfrontpops.append(loading("images/sprite_standing/front/wink/front{}.png".format(i+1)).convert_alpha())
     
-        Wrightpops.append(loading("images/sprite_walking/right/wink/right{}.png".format(i+1)).convert_alpha())
+        Wrightpops.append(loading("images/sprite_standing/right/wink/right{}.png".format(i+1)).convert_alpha())
         
-        Wleftpops.append(loading("images/sprite_walking/left/wink/left{}.png".format(i+1)).convert_alpha())
+        Wleftpops.append(loading("images/sprite_standing/left/wink/left{}.png".format(i+1)).convert_alpha())
+        
+        Rfrontpops.append(loading("images/sprite_walking/front/normal/front{}.png".format(i+1)).convert_alpha())
+        
+        Rbackpops.append(loading("images/sprite_walking/back/back{}.png".format(i+1)).convert_alpha())    
+        
+        Rrightpops.append(loading("images/sprite_walking/right/normal/right{}.png".format(i+1)).convert_alpha())     
+    
+        Rleftpops.append(loading("images/sprite_walking/left/normal/left{}.png".format(i+1)).convert_alpha())      
+        
+        RWfrontpops.append(loading("images/sprite_walking/front/wink/front{}.png".format(i+1)).convert_alpha())
+        
+        RWrightpops.append(loading("images/sprite_walking/right/wink/right{}.png".format(i+1)).convert_alpha())     
+    
+        RWleftpops.append(loading("images/sprite_walking/left/wink/left{}.png".format(i+1)).convert_alpha())      
     
     
     maps = loading("images/map.png").convert_alpha()
@@ -96,6 +119,7 @@ def main():
     save = {}
     save["paramètres"] = option
     save["joueur"] = Pops
+    
     # définiton d'une fonction pour le menu principal au lancement du jeu
     def menu(font):  
         screen.fill(black)
@@ -135,7 +159,7 @@ def main():
             #on baisse alpha
             screen.fill(black)
             screen.blit(maps,(stagePosX,stagePosY))
-            Pops.walking(screen,cameraPosX,Pops.y,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops)
+            Pops.standing(screen,cameraPosX,Pops.y,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops)
             # puis on met à jour l'écran
             screen.blit(fade,(0,0))
             
@@ -151,7 +175,7 @@ def main():
     # définition de la fonction du jeu principal
     def game(key):
         global cameraPosX, cameraPosY, velX, velY
-        nonlocal stagePosX,stagePosY
+        nonlocal stagePosX,stagePosY, ancienPosX, ancienPosY
         #Commandes
         #Si les commandes sont activées
         if Pops.commande_get():
@@ -164,11 +188,12 @@ def main():
                 if key[pygame.K_DOWN] and Pops.y + Pops.height < stagePosY + stageHeight:
                     Pops.y += Pops.speed
                     Pops.set_front()
-              
+            
                 #Haut
                 elif key[pygame.K_UP] and Pops.y > stagePosY:
                     Pops.y -= Pops.speed
                     Pops.set_back()
+                Pops.walk = True
             #Droite    
             elif key[pygame.K_RIGHT] and Pops.x < stageLengthX - initialSPosX - (Pops.width + Pops.width/2):
                 Pops.x += Pops.speed
@@ -181,16 +206,19 @@ def main():
                 elif key[pygame.K_UP] and Pops.y > stagePosY:
                     Pops.y -= Pops.speed
                     Pops.set_back()
+                Pops.walk = True
             #Bas
             elif key[pygame.K_DOWN] and Pops.y + Pops.height < stagePosY + stageHeight:
                 Pops.y += Pops.speed
                 Pops.set_front()
-              
+                Pops.walk = True
             #Haut
             elif key[pygame.K_UP] and Pops.y > stagePosY:
                 Pops.y -= Pops.speed
                 Pops.set_back()
-       
+                Pops.walk = True
+            else:
+                Pops.walk = False
             #Scrolling horizontal
             if Pops.x < startScrollingX:
                 cameraPosX = Pops.x
@@ -223,9 +251,12 @@ def main():
         # puis on affiche le sprite
         screen.fill(black)
         screen.blit(maps,(stagePosX, stagePosY))
-        Pops.walking(screen,cameraPosX,cameraPosY,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops)
+
+        if Pops.walk:
+            Pops.walking(screen,cameraPosX,cameraPosY,Rfrontpops,Rbackpops,Rrightpops,Rleftpops,RWfrontpops,RWrightpops,RWleftpops)
      
-    
+        else:
+            Pops.standing(screen,cameraPosX,cameraPosY,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops)
         # vérifie s'il y un évenement genre appuyer sur une touche
             
         # si on actives les dialogues
@@ -234,6 +265,9 @@ def main():
                 animation_text(text,screen,Pops,font,dialogue_box,curseur,maps,stagePosX,stagePosY,cameraPosX,cameraPosY,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops)
         #puis on met à jour l'écran
         pygame.display.update()
+        
+        ancienPosX = Pops.x
+        ancienPosY = Pops.y
             
     # main loop
     while running:
