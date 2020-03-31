@@ -44,20 +44,39 @@ loading     = pygame.image.load #pour que ce soit plus rapide pour charger des i
 #et on charge les images nécessaires
 
 
-def animation_text(text,screen,sprite,font,dialogue_box,curseur,maps,stagePosX,stagePosY,cameraPosX,cameraPosY,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops):
+def animation_text(text,screen,sprite,font,dialogue_box,curseur,maps,stagePosX,stagePosY,cameraPosX,cameraPosY,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops,bouncepops):
     global dialogue_x,dialogue_y,first_x,first_y
     global string,passer,finir
     global n,frame,p
+    frameP = 0
+    
+    def face(screen,n,frame,face,frame_nb,PosX,PosY):
+        i = n%frame_nb
+        if i < 6:
+            frame = 0
+        elif 6 <= i < 18:
+            frame = 1
+        elif 18 <= i < 30:
+            frame = 2
+        elif 30 <= i < 42:
+            frame = 3
+        if i >= 42:
+            frame = 4
+        
+        screen.blit(face[frame],(PosX,PosY))
+    
     
     #une frame sur deux
-        #on affiche la boite de dialogue
+    #on affiche la boite de dialogue
     if n%2 == 0:
         screen.blit(dialogue_box,(33,700))
+        face(screen, n, frameP, bouncepops,42,1500,550)
     else:
         #on affiche la boite de dialogue
         screen.blit(dialogue_box,(33,700))
         #et le texte qui a déjà été affiché
         screen.blit(font.render(string,False,white),(first_x,first_y))
+        face(screen, n, frameP, bouncepops,42,1500,550)
     #si les commandes sont actives
     if sprite.commande_get():
         #On les désactive et on active l'animation du texte

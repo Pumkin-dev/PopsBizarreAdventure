@@ -53,6 +53,7 @@ def main():
     RWfrontpops   = [] 
     RWrightpops   = []
     RWleftpops    = []
+    bouncepops =[]
     for i in range(6):
        
         frontpops.append(loading("images/sprite_standing/front/normal/front{}.png".format(i+1)).convert_alpha())
@@ -83,6 +84,9 @@ def main():
     
         RWleftpops.append(loading("images/sprite_walking/left/wink/left{}.png".format(i+1)).convert_alpha())      
     
+    for i in range(4):
+        
+        bouncepops.append(loading("images/dialogue/face_discussion/bounce/bounce{}.png ".format(i+1)).convert_alpha())
     
     maps = loading("images/map.png").convert_alpha()
     dialogue_box = loading("images/dialogue/dialogue_box.png").convert()
@@ -141,6 +145,7 @@ def main():
     # def d'une fonction qui permet de faire un fondu en noir
     def fadetoblack(speed):
         nonlocal fade
+        pygame.event.set_blocked(pygame.KEYDOWN)
         if not starting.fadeout:
             screen.blit(font.render("Lancer jeu",False,red),(800,400))
             screen.blit(fade,(0,0))
@@ -262,7 +267,7 @@ def main():
         # si on actives les dialogues
         if Pops.dialogue_get():
             # on active l'animation du texte avec pour paramètre le texte que l'on veut
-                animation_text(text,screen,Pops,font,dialogue_box,curseur,maps,stagePosX,stagePosY,cameraPosX,cameraPosY,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops)
+                animation_text(text,screen,Pops,font,dialogue_box,curseur,maps,stagePosX,stagePosY,cameraPosX,cameraPosY,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops,bouncepops)
         #puis on met à jour l'écran
         pygame.display.update()
         

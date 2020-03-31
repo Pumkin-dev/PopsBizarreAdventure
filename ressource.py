@@ -44,9 +44,9 @@ class Sprite: #Classe pour définir les attributs d'un sprite rapidement
         self.x = x
         self.y = y 
         self.width = widthP 
-        self.height  = heightP 
+        self.height= heightP 
         self.speed = speed 
-        self.front  = True
+        self.front = True
         self.back  = False
         self.right = False
         self.left  = False
@@ -108,15 +108,15 @@ class Sprite: #Classe pour définir les attributs d'un sprite rapidement
             
         if nP%54 < 9:
             frameP = 0
-        elif nP%54 >= 9 and nP%54 < 17:
+        elif nP%54 >= 9 and nP%54 < 18:
             frameP = 1
-        elif nP%54 >= 18 and nP%54 < 26:
+        elif nP%54 >= 18 and nP%54 < 27:
             frameP = 2
-        elif nP%54 >= 27 and nP%54 < 35:
+        elif nP%54 >= 27 and nP%54 < 36:
             frameP = 3
-        elif nP%54 >= 36 and nP%54 < 44:
+        elif nP%54 >= 36 and nP%54 < 45:
             frameP = 4
-        elif nP%54 >= 45 and nP%54 < 53:
+        elif nP%54 >= 45 and nP%54 < 54:
             frameP = 5
         nP += 1
         
@@ -217,4 +217,15 @@ class Event:
 
     
 
-#Fonction pour faire apparaître les lettres les unes après les autres
+class Scene:
+    
+    def __init__(self,bg,level):
+        
+        self.bg = bg
+        self.level = level
+        
+    def draw(self,screen,PosX,PosY):
+        
+        screen.blit(self.bg,(PosX,PosY))
+        
+        
