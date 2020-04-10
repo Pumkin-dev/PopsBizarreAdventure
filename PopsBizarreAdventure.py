@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-
+import os
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 import pygame
 from ressource import Sprite,Event,Option
 from animation import animation_text
@@ -28,8 +29,9 @@ def main():
     
     initialPosX = 700
     initialPosY = 700
-    ancienPosX = initialPosX
-    ancienPosY = initialPosY
+    cameraPosX  = initialPosX
+    cameraPosY  = initialPosY
+    
     widthPops   = 90
     heightPops  = 201
     velPops     = 5
@@ -90,7 +92,7 @@ def main():
     
     maps = loading("images/map.png").convert_alpha()
     dialogue_box = loading("images/dialogue/dialogue_box.png").convert()
-
+    icon = loading("images/logo.png").convert_alpha()
     curseur = [loading("images/dialogue/curseur/Sprite-0001.png").convert_alpha(),loading("images/dialogue/curseur/Sprite-0002.png").convert_alpha()]
     
     stageWidth, stageHeight = maps.get_rect().size
@@ -108,6 +110,7 @@ def main():
     pygame.mixer.init()
     # le titre en fenêtre de jeu
     pygame.display.set_caption("Pops' Bizarre Adventure")
+    pygame.display.set_icon(icon)
     #active le module de texte
     pygame.font.init()
     
@@ -126,12 +129,13 @@ def main():
     
     # définiton d'une fonction pour le menu principal au lancement du jeu
     def menu(font):  
+        key = pygame.key.get_pressed()
         screen.fill(black)
         #remplir le fond de la couleur
         hitbox_lancerjeu = pygame.Rect(800,400,200,50)
         mousepos = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()[0]
-        if hitbox_lancerjeu.collidepoint(mousepos[0],mousepos[1]): 
+        if hitbox_lancerjeu.collidepoint(mousepos[0],mousepos[1]) or key[pygame.K_UP]: 
             screen.blit(font.render("Lancer jeu",False,red),(800,400))
             if click:
                 starting.set_fadetoblack(True)
@@ -139,6 +143,7 @@ def main():
                 
         else:
             screen.blit(font.render("Lancer jeu",False,white),(800,400))
+            
 
         pygame.display.update()    
    
@@ -146,6 +151,7 @@ def main():
     def fadetoblack(speed):
         nonlocal fade
         pygame.event.set_blocked(pygame.KEYDOWN)
+    
         if not starting.fadeout:
             screen.blit(font.render("Lancer jeu",False,red),(800,400))
             screen.blit(fade,(0,0))
@@ -174,13 +180,16 @@ def main():
                 if fade.get_alpha() == 0:
                     # on désactive le processus
                     starting.set_fadetoblack(False)
-                    starting.set_game(True)     
+                    starting.set_game(True)  
         pygame.display.update()
         
     # définition de la fonction du jeu principal
-    def game(key):
-        global cameraPosX, cameraPosY, velX, velY
-        nonlocal stagePosX,stagePosY, ancienPosX, ancienPosY
+    def game():
+        global velX, velY
+        nonlocal stagePosX,stagePosY, cameraPosX, cameraPosY
+        pygame.event.set_allowed(pygame.KEYDOWN)
+         # On associe keys pour gérer les touches plus efficacement
+        key = pygame.key.get_pressed()
         #Commandes
         #Si les commandes sont activées
         if Pops.commande_get():
@@ -253,6 +262,8 @@ def main():
                 else:
                     velY = 0
                 stagePosY -= velY     
+        else:
+            Pops.walk = False
         # puis on affiche le sprite
         screen.fill(black)
         screen.blit(maps,(stagePosX, stagePosY))
@@ -271,16 +282,11 @@ def main():
         #puis on met à jour l'écran
         pygame.display.update()
         
-        ancienPosX = Pops.x
-        ancienPosY = Pops.y
-            
     # main loop
     while running:
         
         # Je bloque tous les évenements avec la souris car ils m'ont bien fait chier
         clock.tick_busy_loop(60) # contrôle le nombre de frame du jeu
-         # On associe keys pour gérer les touches plus efficacement
-        key = pygame.key.get_pressed()
         
         # event handling, gets all event from the event queue
         pygame.event.pump()
@@ -300,10 +306,8 @@ def main():
                 if event.key == pygame.K_SPACE:
                 #on active les dialogues45
                     Pops.set_dialogue(True)
-        # si on appuie sur echap
-        if key[pygame.K_ESCAPE]:
-            # le jeu se ferme
-            running = False
+                if event.key == pygame.K_ESCAPE:
+                    running = False
         if starting.menu_get():
             menu(font)
          
@@ -311,7 +315,7 @@ def main():
             fadetoblack(5)
         
         elif starting.game_get:
-            game(key)
+            game()
         
     pygame.quit()            
  

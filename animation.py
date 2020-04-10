@@ -70,13 +70,13 @@ def animation_text(text,screen,sprite,font,dialogue_box,curseur,maps,stagePosX,s
     #on affiche la boite de dialogue
     if n%2 == 0:
         screen.blit(dialogue_box,(33,700))
-        face(screen, n, frameP, bouncepops,42,1500,550)
+        face(screen, n, frameP, bouncepops,42,1500,538)
     else:
         #on affiche la boite de dialogue
         screen.blit(dialogue_box,(33,700))
         #et le texte qui a déjà été affiché
         screen.blit(font.render(string,False,white),(first_x,first_y))
-        face(screen, n, frameP, bouncepops,42,1500,550)
+        face(screen, n, frameP, bouncepops,42,1500,538)
     #si les commandes sont actives
     if sprite.commande_get():
         #On les désactive et on active l'animation du texte
@@ -85,9 +85,7 @@ def animation_text(text,screen,sprite,font,dialogue_box,curseur,maps,stagePosX,s
     
     if not sprite.animation_get()and not passer:
         #si c'est la 60ème frame
-        if p == 59:
-            #on remet à 0
-            p = 0        
+        p = n%60     
         #on affiche tout le texte
         i = font.render(text, False, white)
         screen.blit(i,(first_x,first_y))
@@ -98,7 +96,7 @@ def animation_text(text,screen,sprite,font,dialogue_box,curseur,maps,stagePosX,s
             frame = 1
         screen.blit(curseur[frame],(940,950))
         # puis on incrémente pour simuler les frames
-        p += 1
+        n += 1
     
     #On récupere les events
     
