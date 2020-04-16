@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
+
+# enlève le message welcome from pygame
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
+
+# règle le problème de l'icône dans la barre des tâches
+import ctypes
+myappid = 'mycompany.myproduct.subproduct.version'
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
 import pygame
-from ressource import Sprite,Event,Option
+from ressource import Chara,Event,Option,Scene,Object
 from animation import animation_text
 
 # définition d'une fonction qui lance le menu principal au lancement du jeu 
-
-
-# define a main function
 def main():
     option = Option() 
     
@@ -17,29 +22,25 @@ def main():
     black = pygame.Color(0,0,0) # crée un objet couleur  en ayant référence RGB du noir
     fade  = pygame.Surface((width,height)) 
     fade.fill((0,0,0))
+    bisfade = pygame.Surface((width,height))
+    bisfade.fill((0,0,0))
     fade.set_alpha(0)
+    bisfade.set_alpha(255)
     white = pygame.Color(255,255,255) # crée un objet couleur  en ayant référence RGB du blanc
     red   = pygame.Color(255,0,0) # de même
     blue  = pygame.Color(0,0,255)
     green = pygame.Color(0,255,0)
+    
+    loading = pygame.image.load # pour que ce soit plus rapide pour charger des images  
+    icon = loading("images/logo.png")
+    # le titre en fenêtre de jeu
+    pygame.display.set_caption("Pops' Bizarre Adventure")
+    pygame.display.set_icon(icon)
     screen  = pygame.display.set_mode((width,height),pygame.RESIZABLE) # pour ouvrir une fenêtre aux dimensions height width
     
     
-    loading = pygame.image.load # pour que ce soit plus rapide pour charger des images  
+  
     
-    initialPosX = 700
-    initialPosY = 700
-    cameraPosX  = initialPosX
-    cameraPosY  = initialPosY
-    
-    widthPops   = 90
-    heightPops  = 201
-    velPops     = 5
-    
-    Pops    = Sprite(initialPosX,initialPosY,widthPops,heightPops,velPops,option) # toutes les caractéristiques de Pops
-    
-    cameraPosX = Pops.x
-    cameraPosY = Pops.y
    
     frontpops   = []
     backpops    = [] 
@@ -73,8 +74,8 @@ def main():
         Wleftpops.append(loading("images/sprite_standing/left/wink/left{}.png".format(i+1)).convert_alpha())
         
         Rfrontpops.append(loading("images/sprite_walking/front/normal/front{}.png".format(i+1)).convert_alpha())
-        
-        Rbackpops.append(loading("images/sprite_walking/back/back{}.png".format(i+1)).convert_alpha())    
+              
+        Rbackpops.append(loading("images/sprite_walking/back/back{}.png".format(i+1)).convert_alpha())
         
         Rrightpops.append(loading("images/sprite_walking/right/normal/right{}.png".format(i+1)).convert_alpha())     
     
@@ -92,41 +93,78 @@ def main():
     
     maps = loading("images/map.png").convert_alpha()
     dialogue_box = loading("images/dialogue/dialogue_box.png").convert()
-    icon = loading("images/logo.png").convert_alpha()
+    move = loading("images/move.png")
+
     curseur = [loading("images/dialogue/curseur/Sprite-0001.png").convert_alpha(),loading("images/dialogue/curseur/Sprite-0002.png").convert_alpha()]
     
-    stageWidth, stageHeight = maps.get_rect().size
+    initialPosX = 600
+    initialPosY = 400
+    
+    widthPops, heightPops  = backpops[0].get_rect().size
+    velPops     = 5
+    
+    Pops        = Chara(initialPosX,initialPosY,widthPops,heightPops,velPops,frontpops,
+    backpops, 
+    rightpops,
+    leftpops,
+    Wfrontpops,
+    Wrightpops,
+    Wleftpops,
+    Rfrontpops,
+    Rbackpops,
+    Rrightpops,
+    Rleftpops,
+    RWfrontpops, 
+    RWrightpops,
+    RWleftpops,
+    bouncepops) # toutes les caractéristiques de Pops
+    
     startScrollingX = option.mw
     startScrollingY = option.mh
-    stagePosX       = 500
-    stagePosY       = -150
-    initialSPosX = stagePosX
-    initialSPosY = stagePosY
-    stageLengthX = stageWidth + 2*initialSPosX
-    stageLengthY = stageHeight + abs(initialSPosY)* 2
+    initialSPosX = 500
+    initialSPosY = -300
+    
+    Bar          = Scene(maps,initialSPosX,initialSPosY)
+    stageLengthX = Bar.width + 2*initialSPosX
+    stageLengthY = Bar.height + abs(initialSPosY)* 2
     # initialize the pygame module
     pygame.init()
     # On initialise le son (si jamais)
     pygame.mixer.init()
-    # le titre en fenêtre de jeu
-    pygame.display.set_caption("Pops' Bizarre Adventure")
-    pygame.display.set_icon(icon)
+    stageWidth, stageHeight = maps.get_rect().size
+    startScrollingX = option.mw
+    startScrollingY = option.mh
+    
+    stageLengthX = stageWidth + 2*initialSPosX
+    stageLengthY = stageHeight + abs(initialSPosY)* 2
+    
     #active le module de texte
     pygame.font.init()
     
     #La police d'écriture du jeu
     font = pygame.font.Font("VCR_OSD_MONO_1.001.ttf",30)   
+    
     # define a variable to control the main loop
     running = True
+    
     # Textes pour tester les boites de dialogues
-    text        = "J'aime les carrotes"
+    text        = "Mais comment veux-tu que je rentre chez moi ?"
+    
     #Objet qui permet de contrôler le nombre de frame et le temps
     clock = pygame.time.Clock()
-    starting = Event()
+    
+    Menu            = Event()
+    Menu.stateEvent = True
+    Fading          = Event()
+    Game            = Event() 
+    
+    Bar = Scene(maps,initialSPosX,initialSPosY)
+    
     save = {}
     save["paramètres"] = option
     save["joueur"] = Pops
-    
+    finir = False
+        
     # définiton d'une fonction pour le menu principal au lancement du jeu
     def menu(font):  
         key = pygame.key.get_pressed()
@@ -138,8 +176,8 @@ def main():
         if hitbox_lancerjeu.collidepoint(mousepos[0],mousepos[1]) or key[pygame.K_UP]: 
             screen.blit(font.render("Lancer jeu",False,red),(800,400))
             if click:
-                starting.set_fadetoblack(True)
-                starting.set_menu(False)
+                Fading.stateEvent = True
+                Menu.stateEvent   = False
                 
         else:
             screen.blit(font.render("Lancer jeu",False,white),(800,400))
@@ -148,45 +186,49 @@ def main():
         pygame.display.update()    
    
     # def d'une fonction qui permet de faire un fondu en noir
-    def fadetoblack(speed):
-        nonlocal fade
+  
+    def fadetoblack(speed,screen,ancient,new,event,bisevent):
+        nonlocal fade, bisfade
         pygame.event.set_blocked(pygame.KEYDOWN)
-    
-        if not starting.fadeout:
-            screen.blit(font.render("Lancer jeu",False,red),(800,400))
+        if fade.get_alpha() < 255:
+            for elt in ancient:
+                if isinstance(elt,(Scene,Object)):
+                    elt.draw(screen)
+                elif isinstance(elt,Chara):
+                    elt.standing(screen)
+                else:
+                    screen.blit(elt[0],(elt[1],elt[2]))
             screen.blit(fade,(0,0))
             
             # si la valeur alpha du noir est en dessous de 255
-            if fade.get_alpha() < 255:
-                fade.set_alpha(fade.get_alpha() + speed)
-                # on incrémente de 1 alpha
-                # si alpha est à son maximum
-                if fade.get_alpha() == 255:
-                    starting.fadeout = True
+            
+            fade.set_alpha(fade.get_alpha() + speed)
                     
                     # on  active le processus inverse
         # si processus inverse activé
-        elif starting.fadeout:
+        elif bisfade.get_alpha() > 0 and fade.get_alpha() == 255:
             #on baisse alpha
-            screen.fill(black)
-            screen.blit(maps,(stagePosX,stagePosY))
-            Pops.standing(screen,cameraPosX,Pops.y,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops)
-            # puis on met à jour l'écran
-            screen.blit(fade,(0,0))
+            for elt in new:
+                if isinstance(elt,(Scene,Object)):
+                    elt.draw(screen)
+                elif isinstance(elt,Chara):
+                    elt.standing(screen)
+                else:
+                    screen.blit(elt[0],(elt[1],elt[2]))
+            screen.blit(bisfade,(0,0))
             
-            if fade.get_alpha() > 0:
-                fade.set_alpha(fade.get_alpha() - speed)
-                # si alpha est égale à 0
-                if fade.get_alpha() == 0:
-                    # on désactive le processus
-                    starting.set_fadetoblack(False)
-                    starting.set_game(True)  
+            bisfade.set_alpha(bisfade.get_alpha() - speed)
+            # si alpha est égale à 0
+            if bisfade.get_alpha() <= 0:
+                # on désactive le processus
+                event.stateEvent = False
+                bisevent.stateEvent = True
+                fade.set_alpha(0)
+                bisfade.set_alpha(255)
         pygame.display.update()
-        
     # définition de la fonction du jeu principal
-    def game():
+    def controles(level):
         global velX, velY
-        nonlocal stagePosX,stagePosY, cameraPosX, cameraPosY
         pygame.event.set_allowed(pygame.KEYDOWN)
          # On associe keys pour gérer les touches plus efficacement
         key = pygame.key.get_pressed()
@@ -194,17 +236,17 @@ def main():
         #Si les commandes sont activées
         if Pops.commande_get():
             #Gauche    
-            if key[pygame.K_LEFT] and Pops.x - Pops.width/2 > stagePosX:
+            if key[pygame.K_LEFT] and Pops.x - Pops.width/2 > level.PosX:
                 Pops.x -= Pops.speed
                 Pops.set_left()  # permet de figer le perso dans la dernière pose qu'il faisait
                 # Si jamais d'autres touches sont pressées
                  #Bas
-                if key[pygame.K_DOWN] and Pops.y + Pops.height < stagePosY + stageHeight:
+                if key[pygame.K_DOWN] and Pops.y + Pops.height < level.PosY + level.height:
                     Pops.y += Pops.speed
                     Pops.set_front()
             
                 #Haut
-                elif key[pygame.K_UP] and Pops.y > stagePosY:
+                elif key[pygame.K_UP] and Pops.y > level.PosY:
                     Pops.y -= Pops.speed
                     Pops.set_back()
                 Pops.walk = True
@@ -212,22 +254,22 @@ def main():
             elif key[pygame.K_RIGHT] and Pops.x < stageLengthX - initialSPosX - (Pops.width + Pops.width/2):
                 Pops.x += Pops.speed
                 Pops.set_right()  # Aussi
-                if key[pygame.K_DOWN] and Pops.y + Pops.height < stagePosY + stageHeight:
+                if key[pygame.K_DOWN] and Pops.y + Pops.height < level.PosY + level.height:
                     Pops.y += Pops.speed
                     Pops.set_front()
               
                 #Haut
-                elif key[pygame.K_UP] and Pops.y > stagePosY:
+                elif key[pygame.K_UP] and Pops.y > level.PosY:
                     Pops.y -= Pops.speed
                     Pops.set_back()
                 Pops.walk = True
             #Bas
-            elif key[pygame.K_DOWN] and Pops.y + Pops.height < stagePosY + stageHeight:
+            elif key[pygame.K_DOWN] and Pops.y + Pops.height < level.PosY + level.height:
                 Pops.y += Pops.speed
                 Pops.set_front()
                 Pops.walk = True
             #Haut
-            elif key[pygame.K_UP] and Pops.y > stagePosY:
+            elif key[pygame.K_UP] and Pops.y > level.PosY:
                 Pops.y -= Pops.speed
                 Pops.set_back()
                 Pops.walk = True
@@ -235,54 +277,38 @@ def main():
                 Pops.walk = False
             #Scrolling horizontal
             if Pops.x < startScrollingX:
-                cameraPosX = Pops.x
+                Pops.cameraX = Pops.x
             
             elif Pops.x > stageLengthX - startScrollingX:
-                cameraPosX = Pops.x - stageLengthX + option.w
+                Pops.cameraX = Pops.x - stageLengthX + option.w
             elif Pops.x >= startScrollingX:
-                cameraPosX = startScrollingX
+                Pops.cameraX = startScrollingX
                 if key[pygame.K_LEFT]:
                     velX = -Pops.speed
                 elif key[pygame.K_RIGHT]:
                     velX = Pops.speed
                 else:
                     velX = 0
-                stagePosX -= velX
+                level.PosX -= velX
             
             if Pops.y > startScrollingY:
-                cameraPosY = Pops.y
+                Pops.cameraY = Pops.y
             elif initialSPosY < Pops.y < initialSPosY + startScrollingY:
-                cameraPosY = Pops.y - initialSPosY 
+                Pops.cameraY = Pops.y - initialSPosY 
             else:
-                cameraPosY = startScrollingY 
+                Pops.cameraY = startScrollingY 
                 if key[pygame.K_UP]:
                     velY = -Pops.speed
                 elif key[pygame.K_DOWN]:
                     velY = Pops.speed
                 else:
                     velY = 0
-                stagePosY -= velY     
+                level.PosY -= velY     
         else:
             Pops.walk = False
         # puis on affiche le sprite
-        screen.fill(black)
-        screen.blit(maps,(stagePosX, stagePosY))
-
-        if Pops.walk:
-            Pops.walking(screen,cameraPosX,cameraPosY,Rfrontpops,Rbackpops,Rrightpops,Rleftpops,RWfrontpops,RWrightpops,RWleftpops)
-     
-        else:
-            Pops.standing(screen,cameraPosX,cameraPosY,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops)
-        # vérifie s'il y un évenement genre appuyer sur une touche
-            
-        # si on actives les dialogues
-        if Pops.dialogue_get():
-            # on active l'animation du texte avec pour paramètre le texte que l'on veut
-                animation_text(text,screen,Pops,font,dialogue_box,curseur,maps,stagePosX,stagePosY,cameraPosX,cameraPosY,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops,bouncepops)
-        #puis on met à jour l'écran
-        pygame.display.update()
-        
-    # main loop
+    
+    # boucle principale
     while running:
         
         # Je bloque tous les évenements avec la souris car ils m'ont bien fait chier
@@ -297,10 +323,10 @@ def main():
                 running = False
             # Si une touche est pressée ...
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_F11: 
+                if event.key == pygame.K_F4: 
                     screen = option.dimension(screen)
                 # Si c'est pendant un dialogue :
-                if Pops.dialogue_get() or starting.fadetoblack_get():
+                if Pops.dialogue_get() or Fading.stateEvent:
                     # On bloque les commandes
                     Pops.set_commande(False) 
                 if event.key == pygame.K_SPACE:
@@ -308,14 +334,35 @@ def main():
                     Pops.set_dialogue(True)
                 if event.key == pygame.K_ESCAPE:
                     running = False
-        if starting.menu_get():
+                if event.key not in (pygame.K_UP,pygame.K_DOWN,pygame.K_LEFT,pygame.K_RIGHT) and (Pops.animation_get() or Pops.finir):
+                    Pops.SInput = True
+                else:
+                    Pops.SInput = False
+        
+        if Menu.stateEvent:
             menu(font)
          
-        elif starting.fadetoblack_get():
-            fadetoblack(5)
-        
-        elif starting.game_get:
-            game()
+        elif Fading.stateEvent:
+            charger = [Bar,Pops]
+            fadetoblack(5,screen,[(font.render("Lancer jeu",False,red),800,400)],charger,Fading,Game)
+        elif Game.stateEvent:
+            controles(Bar)
+              # puis on affiche le sprite
+            screen.fill(black)
+            Bar.draw(screen)
+            if Pops.walk:
+                Pops.walking(screen)
+
+            else:
+                Pops.standing(screen)
+
+            
+            # si on actives les dialogues
+            if Pops.dialogue_get():
+                # on active l'animation du texte avec pour paramètre le texte que l'on veut
+                animation_text(text,screen,Pops,dialogue_box,curseur,Bar)
+                #puis on met à jour l'écran
+            pygame.display.update()
         
     pygame.quit()            
  

@@ -9,16 +9,16 @@ import pygame
 class Option:
     
     def __init__(self):
-        self.w  = 1920
-        self.h  = 1080
+        self.w  = 1280
+        self.h  = 720
         self.mw = int(self.w/2)
         self.mh = int(self.h/2)
     # Pour redimensionner la fenêtre
     def dimension(self,screen):
-        if screen == pygame.display.set_mode((self.w,self.h),pygame.RESIZABLE):
+        if screen.get_flags() & pygame.RESIZABLE:
             screen = pygame.display.set_mode((self.w,self.h),pygame.FULLSCREEN)
         
-        elif screen == pygame.display.set_mode((self.w,self.h),pygame.FULLSCREEN):
+        else:
             screen = pygame.display.set_mode((self.w,self.h),pygame.RESIZABLE)
         
         return screen
@@ -36,27 +36,74 @@ pygame.display.init()
 #coordonnées du texte dans les dialogues
 loading = pygame.image.load
 
-class Sprite: #Classe pour définir les attributs d'un sprite rapidement
-    global option
+class Chara: #Classe pour définir les attributs d'un sprite rapidement
     
     
-    def __init__(self, x, y, widthP, heightP, speed, option):
+    def __init__(self, x, y, widthP, heightP, speed,
+    front,
+    back, 
+    right,
+    left,
+    Wfront,
+    Wright,
+    Wleft,
+    Rfront,
+    Rback,
+    Rright,
+    Rleft,
+    RWfront, 
+    RWright,
+    RWleft,
+    bounce):
         self.x = x
         self.y = y 
         self.width = widthP 
         self.height= heightP 
         self.speed = speed 
+        
+        
         self.front = True
         self.back  = False
         self.right = False
         self.left  = False
         self.walk  = False
+        
+        
         self.dialogue = False
         self.commande = True
         self.animation = False
+        self.passer    = False
+        self.finir     = False
+        self.SInput    = False
         
+        self.cameraX = self.x
+        self.cameraY = self.y
+        
+        
+        self.picfront   = front
+        self.picback    = back
+        self.picright   = right
+        self.picleft    = left
+        self.picWfront  = Wfront
+        self.picWright  = Wright
+        self.picWleft   = Wleft
+        self.picRfront  = Rfront
+        self.picRback   = Rback
+        self.picRright  = Rright
+        self.picRleft   = Rleft
+        self.picRWfront = RWfront
+        self.picRWright = RWright
+        self.picRWleft  = RWleft
+        
+        
+        self.bounce     = bounce        
+        
+        
+    def __iter__(self):
+        return self
    
-    def standing(self,screen,positionX,positionY,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops): #frame à l'image quand il marche sur la carte
+    
+    def standing(self,screen): #frame à l'image quand il marche sur la carte
         global frameP,nP
             
        
@@ -81,28 +128,28 @@ class Sprite: #Classe pour définir les attributs d'un sprite rapidement
         
         if self.front:
             if nP <= 156:
-                screen.blit(frontpops[frameP], (positionX,positionY))
+                screen.blit(self.picfront[frameP], (self.cameraX,self.cameraY))
             else:
-                screen.blit(Wfrontpops[frameP], (positionX,positionY))
+                screen.blit(self.picWfront[frameP], (self.cameraX,self.cameraY))
             
         elif self.right:
             if nP <= 156:
-                screen.blit(rightpops[frameP], (positionX,positionY))
+                screen.blit(self.picright[frameP], (self.cameraX,self.cameraY))
             else:
-                screen.blit(Wrightpops[frameP], (positionX,positionY))
+                screen.blit(self.picWright[frameP], (self.cameraX,self.cameraY))
             
         elif self.back:    
-            screen.blit(backpops[frameP], (positionX,positionY))
+            screen.blit(self.picback[frameP], (self.cameraX,self.cameraY))
         
         elif self.left:
             if nP <= 156:
-                screen.blit(leftpops[frameP], (positionX,positionY)) 
+                screen.blit(self.picleft[frameP], (self.cameraX,self.cameraY)) 
             else:
-                screen.blit(Wleftpops[frameP], (positionX,positionY))
+                screen.blit(self.picWleft[frameP], (self.cameraX,self.cameraY))
                 if nP == 208:
                     nP = 0
     
-    def walking(self, screen, positionX, positionY, Rfrontpops, Rbackpops, Rrightpops, Rleftpops, RWfrontpops, RWrightpops, RWleftpops):
+    def walking(self, screen):
         global nP, frameP
         nP = nP % 216 # toutes les 208 frames
             
@@ -122,24 +169,24 @@ class Sprite: #Classe pour définir les attributs d'un sprite rapidement
         
         if self.front:
             if nP <= 156:
-                screen.blit(Rfrontpops[frameP], (positionX,positionY))
+                screen.blit(self.picRfront[frameP], (self.cameraX,self.cameraY))
             else:
-                screen.blit(RWfrontpops[frameP], (positionX,positionY))
+                screen.blit(self.picRWfront[frameP], (self.cameraX,self.cameraY))
             
         elif self.right:
             if nP <= 156:
-                screen.blit(Rrightpops[frameP], (positionX,positionY))
+                screen.blit(self.picRright[frameP], (self.cameraX,self.cameraY))
             else:
-                screen.blit(RWrightpops[frameP], (positionX,positionY))
+                screen.blit(self.picRWright[frameP], (self.cameraX,self.cameraY))
             
         elif self.back:    
-            screen.blit(Rbackpops[frameP], (positionX,positionY))
+            screen.blit(self.picRback[frameP], (self.cameraX,self.cameraY))
         
         elif self.left:
             if nP <= 156:
-                screen.blit(Rleftpops[frameP], (positionX,positionY)) 
+                screen.blit(self.picRleft[frameP], (self.cameraX,self.cameraY)) 
             else:
-                screen.blit(RWleftpops[frameP], (positionX,positionY))
+                screen.blit(self.picRWleft[frameP], (self.cameraX,self.cameraY))
                 if nP == 208:
                     nP = 0
         
@@ -190,28 +237,13 @@ class Sprite: #Classe pour définir les attributs d'un sprite rapidement
 class Event:
     
     def __init__(self):
-        self.menu = True
-        self.game = False
-        self.fadetoblack = False
-        self.fadeout = False
+        self.stateEvent = False
     
-    def set_menu(self, state):
-        self.menu = state
-        
-    def set_game(self, state):
-        self.game = state
-    
-    def set_fadetoblack(self, state):
-        self.fadetoblack = state
-    
-    def game_get(self):
-        return self.game
-    
-    def menu_get(self):
-        return self.menu
-    
-    def fadetoblack_get(self):
-        return self.fadetoblack
+    def get_state(self):
+        return self.stateEvent
+    def set_state(self,state):
+        self.stateEvent = state
+   
 
         
 
@@ -219,13 +251,38 @@ class Event:
 
 class Scene:
     
-    def __init__(self,bg,level):
+    def __init__(self,picture,PosX,PosY):
         
-        self.bg = bg
-        self.level = level
+        self.picture = picture
+        self.PosX = PosX
+        self.PosY = PosY
+        self.width, self.height = picture.get_rect().size
         
-    def draw(self,screen,PosX,PosY):
+        self.initialPosX = PosX
+        self.initialPosY = PosY
+    
+    def __iter__(self):
+        return self
+    
+    def draw(self,screen):
         
-        screen.blit(self.bg,(PosX,PosY))
+        screen.blit(self.picture,(self.PosX,self.PosY))
+    
+class Object(Scene):
+    
+    def __init__(self,picture,PosX,PosY,hitbox):
+        super().__init__(self,picture,PosX,PosY)
+        self.hitbox = pygame.Rect((self.PosX,self.PosY),(self.width,self.height))
+
+    def newPosition(self,x,y):
+        self.PosX = x
+        self.PosY = y
+    
+    def draw(self,screen):
+        super().draw(self,screen)
+        self.hitbox.move(self.PosX,self.PosY)
+        
+        
+    
         
         

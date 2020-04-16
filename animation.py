@@ -14,7 +14,7 @@ height  = option.h
 #si égal à 1, veut dire que le jeu est dans les dimensions de base c'est à dire 1920*1080    
 
 dialogue_x = 50
-dialogue_y = 728
+dialogue_y = 520
 pygame.display.init()
 #on garde les valeurs initiales dans d'autres variables
 first_x = dialogue_x
@@ -22,8 +22,6 @@ first_y = dialogue_y
 #on crée une chaîne vide pour  conserver les anciennes lettres dans animation_text
 string = ""
 #les processus de passage et de fin sont de base désactivés
-passer = False
-finir = False
 
 white = pygame.Color(255,255,255) #référence RGB du blanc
 black = pygame.Color(0,0,0) #référence RGB du noir
@@ -44,11 +42,13 @@ loading     = pygame.image.load #pour que ce soit plus rapide pour charger des i
 #et on charge les images nécessaires
 
 
-def animation_text(text,screen,sprite,font,dialogue_box,curseur,maps,stagePosX,stagePosY,cameraPosX,cameraPosY,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops,bouncepops):
+def animation_text(text,screen,sprite,dialogue_box,curseur,level):
     global dialogue_x,dialogue_y,first_x,first_y
-    global string,passer,finir
+    global string
     global n,frame,p
     frameP = 0
+    font = pygame.font.Font("VCR_OSD_MONO_1.001.ttf",26)   
+    pygame.event.clear()
     
     def face(screen,n,frame,face,frame_nb,PosX,PosY):
         i = n%frame_nb
@@ -65,25 +65,26 @@ def animation_text(text,screen,sprite,font,dialogue_box,curseur,maps,stagePosX,s
         
         screen.blit(face[frame],(PosX,PosY))
     
+    DposX, DposY = 33, 500
     
     #une frame sur deux
     #on affiche la boite de dialogue
     if n%2 == 0:
-        screen.blit(dialogue_box,(33,700))
-        face(screen, n, frameP, bouncepops,42,1500,538)
+        screen.blit(dialogue_box,(DposX,DposY))
+        face(screen, n, frameP, sprite.bounce,42,980,348)
     else:
         #on affiche la boite de dialogue
-        screen.blit(dialogue_box,(33,700))
+        screen.blit(dialogue_box,(DposX,DposY))
         #et le texte qui a déjà été affiché
         screen.blit(font.render(string,False,white),(first_x,first_y))
-        face(screen, n, frameP, bouncepops,42,1500,538)
+        face(screen, n, frameP, sprite.bounce,42,980,348)
     #si les commandes sont actives
     if sprite.commande_get():
         #On les désactive et on active l'animation du texte
         sprite.set_commande(False)
         sprite.set_animation(True)
     
-    if not sprite.animation_get()and not passer:
+    if not sprite.animation_get()and not sprite.passer:
         #si c'est la 60ème frame
         p = n%60     
         #on affiche tout le texte
@@ -94,45 +95,43 @@ def animation_text(text,screen,sprite,font,dialogue_box,curseur,maps,stagePosX,s
             frame = 0
         elif p >= 15 and p < 30 or p >= 45:
             frame = 1
-        screen.blit(curseur[frame],(940,950))
+        screen.blit(curseur[frame],(630,685))
+        pygame.display.update()
         # puis on incrémente pour simuler les frames
         n += 1
-    
-    #On récupere les events
-    
-    for event in pygame.event.get():
-        #si l'event est une touche et ce n'est ni Haut, Bas, Gauche ou Droite
-        if event.type == pygame.KEYDOWN and not event.key in (pygame.K_UP,pygame.K_DOWN,pygame.K_LEFT,pygame.K_RIGHT):
-            #Si l'animation est en cours
-            if sprite.animation_get():
-                #on active le processus de passage
-                passer = True
+          
+    if sprite.SInput:
+        #Si l'animation est en cours
+        if sprite.animation_get():
+            #on active le processus de passage
+            sprite.passer = True
             #si le processus de fin est activé
-            if finir:
-                #on réinitialise les variables
-                n = 0
-                string = ""
-                finir = False
-                screen.fill(black)
-                dialogue_x = first_x
-                dialogue_y = first_y
-                #et on désactive les dialogues et active les commandes
-                sprite.set_dialogue(False)
-                sprite.set_commande(True)
-                screen.blit(maps,(stagePosX,stagePosY))
-                sprite.walking(screen,cameraPosX,cameraPosY,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops)
+        elif sprite.finir:
+            #on réinitialise les variables
+            n = 0
+            string = ""
+            sprite.finir = False
+            screen.fill(black)
+            dialogue_x = first_x
+            dialogue_y = first_y
+            #et on désactive les dialogues et active les commandes
+            sprite.set_dialogue(False)
+            sprite.set_commande(True)
+            level.draw(screen)
+            sprite.walking(screen)
+        sprite.SInput = False
     
     
     #si processus de passage activé
-    if passer:
+    if sprite.passer:
         #on affiche le texte en entier
         i = font.render(text, False, white)
         screen.blit(i,(first_x,first_y))
         #on désactive l'animation
         sprite.set_animation(False) 
         #et on désactive le processus de passage et active le processus de fin
-        passer = False
-        finir = True
+        sprite.passer = False
+        sprite.finir = True
 
     # si le processus d'animation est activé    
     if sprite.animation_get():
@@ -161,6 +160,6 @@ def animation_text(text,screen,sprite,font,dialogue_box,curseur,maps,stagePosX,s
     if n == len(text)*2 - 1:
         #on désactive le processus d'animation et on active le processus de fin
         sprite.set_animation(False)
-        finir = True
+        sprite.finir = True
     # si animation désactivée
     
