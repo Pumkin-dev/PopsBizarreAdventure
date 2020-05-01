@@ -119,6 +119,8 @@ def main():
     RWleftpops,
     bouncepops) # toutes les caractéristiques de Pops
     
+    # toutes les caractéristiques pour le scrolling
+    # on prend la moitié de l'écran pour le début du scrolling 
     startScrollingX = option.mw
     startScrollingY = option.mh
     initialSPosX = 500
@@ -148,7 +150,7 @@ def main():
     running = True
     
     # Textes pour tester les boites de dialogues
-    text        = "Mais comment veux-tu que je rentre chez moi ?"
+    text        = "Mais comment veux-tu que je rentre chez moi ? J'ai pété ma voiture lol me faudra au moins 2 mois"
     
     #Objet qui permet de contrôler le nombre de frame et le temps
     clock = pygame.time.Clock()

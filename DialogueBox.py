@@ -64,7 +64,6 @@ def animation_text(text,screen,sprite,dialogue_box,curseur,level):
             frame = 4
         
         screen.blit(face[frame],(PosX,PosY))
-    
     DposX, DposY = 33, 500
     
     #une frame sur deux
@@ -135,29 +134,29 @@ def animation_text(text,screen,sprite,dialogue_box,curseur,level):
 
     # si le processus d'animation est activé    
     if sprite.animation_get():
-        #une frame sur deux
-        if n%2 == 0:
-            #pour réguler les frames
-            m = int(n/2)
-            #puis on fait afficher les lettres déjà passées
-            j = font.render(string,False,white) 
-            screen.blit(j,(first_x,first_y))
-            #puis on ajoute la lettre suivante à string pour la réafficher à la prochaine frame
-            string += text[m]
-            #puis on affiche la prochaine lettre au coordonnées données
-            i = font.render(text[m],False,white)
-            screen.blit(i,(dialogue_x,dialogue_y))
-            #une frame sur quatre
-            if n%4 == 0:
-                #jouer le son de texte
-                sfx_dialogue.play()
-            #on ajoute la taille d'un caractère pour donner l'impression
-            #que c'est comme dans un logiciel de traitement de texte
-            dialogue_x += font.size(text)[0] / len(text) 
+
+        #puis on fait afficher les lettres déjà passées
+        j = font.render(string,False,white) 
+        screen.blit(j,(first_x,first_y))
+        #puis on ajoute la lettre suivante à string pour la réafficher à la prochaine frame
+        string += text[n]
+        #puis on affiche la prochaine lettre au coordonnées données
+        i = font.render(text[n],False,white)
+        screen.blit(i,(dialogue_x,dialogue_y))
+        #une frame sur quatre
+        if n%4 == 0:
+            #jouer le son de texte
+            sfx_dialogue.play()
+        #on ajoute la taille d'un caractère pour donner l'impression
+        #que c'est comme dans un logiciel de traitement de texte
+        dialogue_x += font.size(text)[0] / len(text) 
+        if dialogue_x >= 980:
+            dialogue_y += font.size(text)[1] + 2
+            dialogue_x = first_x
         #puis on incrémente pour simuler les frames
         n += 1
     #si la dernière lettre a été affichée
-    if n == len(text)*2 - 1:
+    if n == len(text) - 1:
         #on désactive le processus d'animation et on active le processus de fin
         sprite.set_animation(False)
         sprite.finir = True
