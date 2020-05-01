@@ -60,6 +60,8 @@ class Chara: #Classe pour définir les attributs d'un sprite rapidement
         self.width = widthP 
         self.height= heightP 
         self.speed = speed 
+        self.VelX  = 0
+        self.VelY  = 0
         
         
         self.front = True
@@ -95,7 +97,10 @@ class Chara: #Classe pour définir les attributs d'un sprite rapidement
         self.picRWright = RWright
         self.picRWleft  = RWleft
         
-        
+        self.hitbox     = pygame.Rect((self.x,self.y),front[0].get_rect().size)
+        self.uphitbox   = pygame.Rect((self.x,self.y),(int(front[0].get_rect().size[0]/2),int(front[0].get_rect().size[1]/2)))
+        self.downhitbox = pygame.Rect((self.x + int(front[0].get_rect().size[0]/2),self.y + int(front[0].get_rect().size[1]/2)),(int(front[0].get_rect().size[0]/2),int(front[0].get_rect().size[1]/2)))
+       
         self.bounce     = bounce        
         
         
@@ -148,7 +153,9 @@ class Chara: #Classe pour définir les attributs d'un sprite rapidement
                 screen.blit(self.picWleft[frameP], (self.cameraX,self.cameraY))
                 if nP == 208:
                     nP = 0
-    
+        self.hitbox.move(self.x,self.y)
+        self.uphitbox.move(self.x,self.y)
+        self.downhitbox.move(self.x + int(self.picfront[0].get_rect().size[0]/2),self.y + int(self.picfront[0].get_rect().size[1]/2))
     def walking(self, screen):
         global nP, frameP
         nP = nP % 216 # toutes les 208 frames
@@ -189,7 +196,9 @@ class Chara: #Classe pour définir les attributs d'un sprite rapidement
                 screen.blit(self.picRWleft[frameP], (self.cameraX,self.cameraY))
                 if nP == 208:
                     nP = 0
-        
+        self.hitbox.move(self.x,self.y)
+        self.uphitbox.move(self.x,self.y)
+        self.downhitbox.move(self.x + int(self.picfront[0].get_rect().size[0]/2),self.y + int(self.picfront[0].get_rect().size[1]/2))
     #Pour aller plus vite, j'ai créé des méthodes qui tournent le sprite
     def set_right(self):
         self.right = True
@@ -260,6 +269,7 @@ class Scene:
         
         self.initialPosX = PosX
         self.initialPosY = PosY
+        self.furnitures = []
     
     def __iter__(self):
         return self
@@ -268,18 +278,24 @@ class Scene:
         
         screen.blit(self.picture,(self.PosX,self.PosY))
     
+    def addFurnitures(self,furniture):
+        self.furnitures.append(furniture)
+    
 class Object(Scene):
     
-    def __init__(self,picture,PosX,PosY,hitbox):
-        super().__init__(self,picture,PosX,PosY)
+    def __init__(self,picture,PosX,PosY,ownX,ownY):
+        Scene.__init__(self,picture,PosX,PosY)
         self.hitbox = pygame.Rect((self.PosX,self.PosY),(self.width,self.height))
+        self.ownX = ownX
+        self.ownY = ownY
+
 
     def newPosition(self,x,y):
         self.PosX = x
         self.PosY = y
     
     def draw(self,screen):
-        super().draw(self,screen)
+        Scene.draw(self,screen)
         self.hitbox.move(self.PosX,self.PosY)
         
         

@@ -11,7 +11,7 @@ ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 import pygame
 from ressource import Chara,Event,Option,Scene,Object
-from animation import animation_text
+from DialogueBox import animation_text
 
 # définition d'une fonction qui lance le menu principal au lancement du jeu 
 def main():
@@ -38,9 +38,6 @@ def main():
     pygame.display.set_icon(icon)
     screen  = pygame.display.set_mode((width,height),pygame.RESIZABLE) # pour ouvrir une fenêtre aux dimensions height width
     
-    
-  
-    
    
     frontpops   = []
     backpops    = [] 
@@ -49,14 +46,14 @@ def main():
     Wfrontpops  = []
     Wrightpops  = []
     Wleftpops   = []
-    Rfrontpops   = []
-    Rbackpops    = [] 
-    Rrightpops   = []
-    Rleftpops    = []
-    RWfrontpops   = [] 
-    RWrightpops   = []
-    RWleftpops    = []
-    bouncepops =[]
+    Rfrontpops  = []
+    Rbackpops   = [] 
+    Rrightpops  = []
+    Rleftpops   = []
+    RWfrontpops = [] 
+    RWrightpops = []
+    RWleftpops  = []
+    bouncepops  =[]
     for i in range(6):
        
         frontpops.append(loading("images/sprite_standing/front/normal/front{}.png".format(i+1)).convert_alpha())
@@ -91,9 +88,8 @@ def main():
         
         bouncepops.append(loading("images/dialogue/face_discussion/bounce/bounce{}.png ".format(i+1)).convert_alpha())
     
-    maps = loading("images/map.png").convert_alpha()
+    bar = loading("images/level/background/bar.png").convert_alpha()
     dialogue_box = loading("images/dialogue/dialogue_box.png").convert()
-    move = loading("images/move.png")
 
     curseur = [loading("images/dialogue/curseur/Sprite-0001.png").convert_alpha(),loading("images/dialogue/curseur/Sprite-0002.png").convert_alpha()]
     
@@ -123,17 +119,22 @@ def main():
     # on prend la moitié de l'écran pour le début du scrolling 
     startScrollingX = option.mw
     startScrollingY = option.mh
-    initialSPosX = 500
-    initialSPosY = -300
+    initialSPosX    = 500
+    initialSPosY    = -300
     
-    Bar          = Scene(maps,initialSPosX,initialSPosY)
+    Bar          = Scene(bar,initialSPosX,initialSPosY)
     stageLengthX = Bar.width + 2*initialSPosX
     stageLengthY = Bar.height + abs(initialSPosY)* 2
+    testPosX = Bar.PosX+259
+    testPosY = Bar.PosY+716
+    table1       = loading("images/level/objects/table1.png")
+    Table1       = Object(table1, testPosX, testPosY,256,716)
+    Bar.addFurnitures(Table1)
     # initialize the pygame module
     pygame.init()
     # On initialise le son (si jamais)
     pygame.mixer.init()
-    stageWidth, stageHeight = maps.get_rect().size
+    stageWidth, stageHeight = bar.get_rect().size
     startScrollingX = option.mw
     startScrollingY = option.mh
     
@@ -150,8 +151,7 @@ def main():
     running = True
     
     # Textes pour tester les boites de dialogues
-    text        = "Mais comment veux-tu que je rentre chez moi ? J'ai pété ma voiture lol me faudra au moins 2 mois"
-    
+    text        = "Mais comment veux-tu que je rentre chez moi ? J'ai pété ma voiture lol me faudra au moins 2 mois."
     #Objet qui permet de contrôler le nombre de frame et le temps
     clock = pygame.time.Clock()
     
@@ -160,12 +160,11 @@ def main():
     Fading          = Event()
     Game            = Event() 
     
-    Bar = Scene(maps,initialSPosX,initialSPosY)
+    Bar = Scene(bar,initialSPosX,initialSPosY)
     
     save = {}
     save["paramètres"] = option
     save["joueur"] = Pops
-    finir = False
         
     # définiton d'une fonction pour le menu principal au lancement du jeu
     def menu(font):  
@@ -228,6 +227,7 @@ def main():
                 fade.set_alpha(0)
                 bisfade.set_alpha(255)
         pygame.display.update()
+   
     # définition de la fonction du jeu principal
     def controles(level):
         global velX, velY
@@ -240,21 +240,25 @@ def main():
             #Gauche    
             if key[pygame.K_LEFT] and Pops.x - Pops.width/2 > level.PosX:
                 Pops.x -= Pops.speed
+                Pops.velX = -1
                 Pops.set_left()  # permet de figer le perso dans la dernière pose qu'il faisait
                 # Si jamais d'autres touches sont pressées
                  #Bas
                 if key[pygame.K_DOWN] and Pops.y + Pops.height < level.PosY + level.height:
                     Pops.y += Pops.speed
+                    Pops.VelY = 1
                     Pops.set_front()
             
                 #Haut
                 elif key[pygame.K_UP] and Pops.y > level.PosY:
                     Pops.y -= Pops.speed
+                    Pops.VelY = -1
                     Pops.set_back()
                 Pops.walk = True
             #Droite    
             elif key[pygame.K_RIGHT] and Pops.x < stageLengthX - initialSPosX - (Pops.width + Pops.width/2):
                 Pops.x += Pops.speed
+                Pops.VelX = 1
                 Pops.set_right()  # Aussi
                 if key[pygame.K_DOWN] and Pops.y + Pops.height < level.PosY + level.height:
                     Pops.y += Pops.speed
@@ -263,16 +267,19 @@ def main():
                 #Haut
                 elif key[pygame.K_UP] and Pops.y > level.PosY:
                     Pops.y -= Pops.speed
+                    Pops.VelY = -1
                     Pops.set_back()
                 Pops.walk = True
             #Bas
             elif key[pygame.K_DOWN] and Pops.y + Pops.height < level.PosY + level.height:
                 Pops.y += Pops.speed
+                Pops.VelY = 1
                 Pops.set_front()
                 Pops.walk = True
             #Haut
             elif key[pygame.K_UP] and Pops.y > level.PosY:
                 Pops.y -= Pops.speed
+                Pops.VelY = -1
                 Pops.set_back()
                 Pops.walk = True
             else:
@@ -308,8 +315,30 @@ def main():
                 level.PosY -= velY     
         else:
             Pops.walk = False
-        # puis on affiche le sprite
     
+    def printlevel(screen,level,characters):
+        level.draw(screen)
+        print(level.furnitures)
+        for furniture in level.furnitures:
+            print(level.furnitures)
+            furniture.newPosition(level.PosX + furniture.ownX, level.PosY + furniture.ownY)
+            furniture.draw(screen)
+            if furniture.hitbox.colliderect(characters[0].hitbox):
+                if characters[0].VelX > 0:
+                    characters[0].x = furniture.hitbox.center[0] - characters[0].width
+                elif characters[0].VelX < 0:
+                    characters[0].x = furniture.hitbox.center[0] + characters[0].width
+                if characters[0].VelY > 0:
+                    characters[0].y = furniture.hitbox.center[1] - characters[0].height
+                elif characters[0].VelX < 0:
+                    characters[0].y = furniture.hitbox.center[1] + characters[0].height
+        for charac in characters:
+            if charac.walk:
+                charac.walking(screen)
+
+            else:
+                charac.standing(screen) 
+        pygame.display.update()
     # boucle principale
     while running:
         
@@ -349,15 +378,9 @@ def main():
             fadetoblack(5,screen,[(font.render("Lancer jeu",False,red),800,400)],charger,Fading,Game)
         elif Game.stateEvent:
             controles(Bar)
-              # puis on affiche le sprite
+               # puis on affiche le sprite
             screen.fill(black)
-            Bar.draw(screen)
-            if Pops.walk:
-                Pops.walking(screen)
-
-            else:
-                Pops.standing(screen)
-
+            printlevel(screen,Bar,[Pops])
             
             # si on actives les dialogues
             if Pops.dialogue_get():
