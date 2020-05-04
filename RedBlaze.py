@@ -34,7 +34,7 @@ def main():
     loading = pygame.image.load # pour que ce soit plus rapide pour charger des images  
     icon = loading("images/logo.png")
     # le titre en fenêtre de jeu
-    pygame.display.set_caption("Pops' Bizarre Adventure")
+    pygame.display.set_caption("Red Blaze")
     pygame.display.set_icon(icon)
     screen  = pygame.display.set_mode((width,height),pygame.RESIZABLE) # pour ouvrir une fenêtre aux dimensions height width
     
@@ -125,10 +125,8 @@ def main():
     Bar          = Scene(bar,initialSPosX,initialSPosY)
     stageLengthX = Bar.width + 2*initialSPosX
     stageLengthY = Bar.height + abs(initialSPosY)* 2
-    testPosX = Bar.PosX+259
-    testPosY = Bar.PosY+716
     table1       = loading("images/level/objects/table1.png")
-    Table1       = Object(table1, testPosX, testPosY,256,716)
+    Table1       = Object(table1, Bar,256, 716)
     Bar.addFurnitures(Table1)
     # initialize the pygame module
     pygame.init()
@@ -140,7 +138,6 @@ def main():
     
     stageLengthX = stageWidth + 2*initialSPosX
     stageLengthY = stageHeight + abs(initialSPosY)* 2
-    
     #active le module de texte
     pygame.font.init()
     
@@ -159,9 +156,11 @@ def main():
     Menu.stateEvent = True
     Fading          = Event()
     Game            = Event() 
-    
-    Bar = Scene(bar,initialSPosX,initialSPosY)
-    
+    Scrolling       = Event()
+    Scrolling.stateEvent = True
+    axisX           = Event()
+    axisY           = Event()
+        
     save = {}
     save["paramètres"] = option
     save["joueur"] = Pops
@@ -234,111 +233,164 @@ def main():
         pygame.event.set_allowed(pygame.KEYDOWN)
          # On associe keys pour gérer les touches plus efficacement
         key = pygame.key.get_pressed()
+        
+
+    
         #Commandes
         #Si les commandes sont activées
         if Pops.commande_get():
             #Gauche    
             if key[pygame.K_LEFT] and Pops.x - Pops.width/2 > level.PosX:
                 Pops.x -= Pops.speed
-                Pops.velX = -1
+                Pops.VelX = -Pops.speed
                 Pops.set_left()  # permet de figer le perso dans la dernière pose qu'il faisait
                 # Si jamais d'autres touches sont pressées
                  #Bas
                 if key[pygame.K_DOWN] and Pops.y + Pops.height < level.PosY + level.height:
                     Pops.y += Pops.speed
-                    Pops.VelY = 1
+                    Pops.VelY = Pops.speed
                     Pops.set_front()
             
                 #Haut
                 elif key[pygame.K_UP] and Pops.y > level.PosY:
                     Pops.y -= Pops.speed
-                    Pops.VelY = -1
                     Pops.set_back()
+                    Pops.VelY = -Pops.speed
                 Pops.walk = True
             #Droite    
-            elif key[pygame.K_RIGHT] and Pops.x < stageLengthX - initialSPosX - (Pops.width + Pops.width/2):
+            elif key[pygame.K_RIGHT] and Pops.x < initialSPosX + level.width -(Pops.width + Pops.width/2):
                 Pops.x += Pops.speed
-                Pops.VelX = 1
+                Pops.VelX = Pops.speed
                 Pops.set_right()  # Aussi
                 if key[pygame.K_DOWN] and Pops.y + Pops.height < level.PosY + level.height:
                     Pops.y += Pops.speed
+                    Pops.velY = Pops.speed
                     Pops.set_front()
               
                 #Haut
                 elif key[pygame.K_UP] and Pops.y > level.PosY:
                     Pops.y -= Pops.speed
-                    Pops.VelY = -1
+                    Pops.velY = -Pops.speed
                     Pops.set_back()
                 Pops.walk = True
             #Bas
             elif key[pygame.K_DOWN] and Pops.y + Pops.height < level.PosY + level.height:
                 Pops.y += Pops.speed
-                Pops.VelY = 1
+                Pops.VelY = Pops.speed
                 Pops.set_front()
                 Pops.walk = True
             #Haut
             elif key[pygame.K_UP] and Pops.y > level.PosY:
                 Pops.y -= Pops.speed
-                Pops.VelY = -1
+                Pops.VelY = -Pops.speed
                 Pops.set_back()
                 Pops.walk = True
+           
             else:
                 Pops.walk = False
+            if not key[pygame.K_RIGHT] and not key[pygame.K_LEFT]:
+                Pops.VelX = 0
+            if not key[pygame.K_DOWN] and not key[pygame.K_UP]:
+                Pops.VelY = 0
             #Scrolling horizontal
             if Pops.x < startScrollingX:
                 Pops.cameraX = Pops.x
+                level.PosX   = initialSPosX
             
             elif Pops.x > stageLengthX - startScrollingX:
                 Pops.cameraX = Pops.x - stageLengthX + option.w
+                
             elif Pops.x >= startScrollingX:
                 Pops.cameraX = startScrollingX
-                if key[pygame.K_LEFT]:
-                    velX = -Pops.speed
-                elif key[pygame.K_RIGHT]:
-                    velX = Pops.speed
-                else:
-                    velX = 0
-                level.PosX -= velX
-            
+                if Scrolling.stateEvent:
+                    if key[pygame.K_LEFT]:
+                        velX = -Pops.speed
+                    elif key[pygame.K_RIGHT]:
+                        velX = Pops.speed
+                    else:
+                        velX = 0
+                    level.PosX -= velX
+                    level.Sdx  += velX
+
+            print(level.Sdx)            
             if Pops.y > startScrollingY:
                 Pops.cameraY = Pops.y
+                level.PosY   = initialSPosY
             elif initialSPosY < Pops.y < initialSPosY + startScrollingY:
                 Pops.cameraY = Pops.y - initialSPosY 
             else:
                 Pops.cameraY = startScrollingY 
-                if key[pygame.K_UP]:
-                    velY = -Pops.speed
-                elif key[pygame.K_DOWN]:
-                    velY = Pops.speed
-                else:
-                    velY = 0
-                level.PosY -= velY     
+                if Scrolling.stateEvent:
+                    if key[pygame.K_UP]:
+                        velY = -Pops.speed
+                    elif key[pygame.K_DOWN]:
+                        velY = Pops.speed
+                    else:
+                        velY = 0
+                    level.PosY -= velY     
         else:
             Pops.walk = False
     
     def printlevel(screen,level,characters):
+        def collision(chara,furnitures,velX,velY):
+            for elt in furnitures:
+                if pygame.sprite.collide_rect(chara,elt):
+                    if velX != 0 and velY == 0:
+                        if chara.rect.right > elt.rect.left and chara.rect.right < elt.rect.right:
+                            chara.rect.right = elt.rect.left
+                            chara.x = elt.rect.left - chara.rect.w
+                            chara.walk = False
+                            Scrolling.stateEvent = False
+                            
+                        if chara.rect.left < elt.rect.right and chara.rect.right > elt.rect.right:
+                            chara.rect.left = elt.rect.right
+                            chara.x = elt.rect.right
+                            chara.walk = False
+                            Scrolling.stateEvent = False
+                    if velX ==0 and velY !=0:  
+                        if chara.rect.bottom >= elt.rect.top and chara.cameraX + chara.rect.w > elt.rect.left:
+                            chara.rect.bottom = elt.rect.top
+                            chara.x = elt.rect.top - chara.rect.w
+
+                if velX != 0 and velY == 0 and chara.y + chara.rect.h > elt.rect.top or chara.y > elt.rect.bottom:
+                    if velX > 0 and chara.rect.right + velX >= elt.rect.left and chara.x <= elt.rect.left:
+                        print('bite')
+                        chara.walk = False
+                        Scrolling.stateEvent = False
+                        chara.x = elt.rect.left - chara.rect.w
+                    elif velX < 0 and chara.rect.left + velX <= elt.rect.right and chara.x >= elt.rect.left:
+                        print('bite')
+                        chara.walk = False
+                        Scrolling.stateEvent = False
+                        chara.x = elt.rect.right
+                    else:
+                        chara.walk = True
+                        Scrolling.stateEvent = True
+                    
         level.draw(screen)
-        print(level.furnitures)
-        for furniture in level.furnitures:
-            print(level.furnitures)
-            furniture.newPosition(level.PosX + furniture.ownX, level.PosY + furniture.ownY)
-            furniture.draw(screen)
-            if furniture.hitbox.colliderect(characters[0].hitbox):
-                if characters[0].VelX > 0:
-                    characters[0].x = furniture.hitbox.center[0] - characters[0].width
-                elif characters[0].VelX < 0:
-                    characters[0].x = furniture.hitbox.center[0] + characters[0].width
-                if characters[0].VelY > 0:
-                    characters[0].y = furniture.hitbox.center[1] - characters[0].height
-                elif characters[0].VelX < 0:
-                    characters[0].y = furniture.hitbox.center[1] + characters[0].height
+
+        pygame.draw.rect(screen,green,characters[0].rect)
+        pygame.draw.rect(screen,blue,characters[0].fakerect)
+        pygame.draw.rect(screen,white,level.furnitures[0].rect)
+        pygame.draw.rect(screen,red,level.furnitures[0].fakerect)
+        print("Postion x :", characters[0].x,"/n Position y :", characters[0].y)
+        print(characters[0].VelX,characters[0].VelY)
+        collision(characters[0], level.furnitures,characters[0].VelX,characters[0].VelY)
+        
+        for elt in level.furnitures:
+            elt.draw(screen)
+        
         for charac in characters:
             if charac.walk:
                 charac.walking(screen)
 
             else:
                 charac.standing(screen) 
+        
+        
         pygame.display.update()
+ 
+    
     # boucle principale
     while running:
         
@@ -374,14 +426,13 @@ def main():
             menu(font)
          
         elif Fading.stateEvent:
-            charger = [Bar,Pops]
+            charger = [Bar,*Bar.furnitures,Pops]
             fadetoblack(5,screen,[(font.render("Lancer jeu",False,red),800,400)],charger,Fading,Game)
         elif Game.stateEvent:
             controles(Bar)
                # puis on affiche le sprite
             screen.fill(black)
-            printlevel(screen,Bar,[Pops])
-            
+            printlevel(screen, Bar, [Pops])
             # si on actives les dialogues
             if Pops.dialogue_get():
                 # on active l'animation du texte avec pour paramètre le texte que l'on veut

@@ -69,7 +69,7 @@ def animation_text(text,screen,sprite,dialogue_box,curseur,level):
     global dialogue_x,dialogue_y,first_x,first_y,rememberStrings,font
     global string
     global n,frame,p,factor,spaces,testline
-    font = pygame.font.Font("VCR_OSD_MONO_1.001.ttf",26)   
+    font = pygame.font.Font("VCR_OSD_MONO_1.001.ttf",30)   
     frameP = 0
     pygame.event.clear()
     listwords = text.split(" ")
