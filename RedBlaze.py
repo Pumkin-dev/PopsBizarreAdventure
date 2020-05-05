@@ -309,9 +309,7 @@ def main():
                     else:
                         velX = 0
                     level.PosX -= velX
-                    level.Sdx += velX
 
-            print(level.Sdx)
             if Pops.y > startScrollingY:
                 Pops.cameraY = Pops.y
                 level.PosY = initialSPosY
@@ -330,63 +328,104 @@ def main():
         else:
             Pops.walk = False
 
+    # fonction qui permet d'afficher la carte
     def printlevel(screen, level, characters):
+        # autre fonction qui permet de gérer les collisions
         def collision(chara, furnitures, velX, velY):
+            # pour chaque objet sur la carte
             for elt in furnitures:
+                # on vérifie les collisions
                 if pygame.sprite.collide_rect(chara, elt):
+                    # si l'axe en question est celle horizontale
                     if velX != 0 and velY == 0:
+                        # s'il est à gauche de l'objet
                         if elt.rect.left < chara.rect.right < elt.rect.right:
-                            chara.rect.right = elt.rect.left
+                            # on pousse le joueur au bord de l'objet et on arrête le scrolling et la marche
                             chara.x = elt.rect.left - chara.rect.w
                             chara.walk = False
                             Scrolling.stateEvent = False
-
+                            # s'il est à droite
                         if chara.rect.left < elt.rect.right < chara.rect.right:
-                            chara.rect.left = elt.rect.right
+                            # idem
                             chara.x = elt.rect.right
                             chara.walk = False
                             Scrolling.stateEvent = False
+                    # si l'axe en question est celle verticale
                     if velX == 0 and velY != 0:
+                        # s'il est en haut
                         if chara.rect.bottom >= elt.rect.top and chara.x + chara.rect.w > elt.rect.left:
-                            chara.rect.bottom = elt.rect.top
                             chara.y = elt.rect.top - chara.rect.w
                             chara.walk = False
                             Scrolling.stateEvent = False
+                        # s'il est en bas
+                        if chara.rect.top <= elt.rect.bottom:
+                            chara.y = elt.rect.bottom
+                            chara.walk = False
+                            Scrolling.stateEvent = False
 
-                if velX != 0 and velY == 0 and elt.rect.bottom >= chara.y >= elt.rect.top:
-                    if velX > 0 and chara.rect.right + velX >= elt.rect.left >= chara.x:
-                        chara.walk = False
-                        Scrolling.stateEvent = False
-                        chara.x = elt.rect.left - chara.rect.w
-                    elif velX < 0 and chara.rect.left + velX <= elt.rect.right and chara.x >= elt.rect.left:
-                        chara.walk = False
-                        Scrolling.stateEvent = False
-                        chara.x = elt.rect.right
-                    else:
-                        chara.walk = True
-                        Scrolling.stateEvent = True
-                if velX == 0 and velY != 0 and elt.rect.left <= chara.x <= elt.rect.right:
-                    print('bite')
-                    if velY > 0 and chara.rect.bottom + velY >= elt.rect.top > chara.y:
+                # si le joueur se situe sur les bords de l'objet
+                if elt.rect.bottom >= chara.y and chara.rect.bottom >= elt.rect.top:
+                    # s'il bouge horizontalement
+                    if velX != 0 and chara.rect.right <= elt.rect.left or velX != 0 and chara.rect.left >= elt.rect.right:
+                        # s'il est à gauche de l'objet
+                        if velX > 0 and chara.rect.right + velX >= elt.rect.left >= chara.x:
+                            chara.walk = False
+                            Scrolling.stateEvent = False
+                            chara.x = elt.rect.left - chara.rect.w
+                        # s'il est à droite
+                        elif velX < 0 and chara.rect.left + velX <= elt.rect.right and chara.x >= elt.rect.left:
+                            chara.walk = False
+                            Scrolling.stateEvent = False
+                            chara.x = elt.rect.right
+                        # s'il n'est pas proche de l'objet on ne fait rien
+                        else:
+                            chara.walk = True
+                            Scrolling.stateEvent = True
+                    # si on bouge verticalement sur les bords verticaux
+                    if velY != 0 and chara.rect.right <= elt.rect.left or velY != 0 and chara.rect.left >= elt.rect.right:
+                        # si on bouge
+                        if chara.rect.right + velX >= elt.rect.left >= chara.x:
+                            chara.walk = True
+                            Scrolling.stateEvent = True
+                            chara.x = elt.rect.left - chara.rect.w
+                        elif chara.rect.left + velX <= elt.rect.right and chara.x >= elt.rect.left:
+                            chara.walk = True
+                            Scrolling.stateEvent = True
+                            chara.x = elt.rect.right
 
-                        chara.walk = False
-                        Scrolling.stateEvent = False
-                        chara.y = elt.rect.top - chara.rect.h
-                    elif velY < 0 and chara.rect.top + velY <= elt.rect.bottom < chara.rect.bottom:
-                        chara.walk = False
-                        Scrolling.stateEvent = False
-                        chara.y = elt.rect.bottom
-                    else:
-                        chara.walk = True
-                        Scrolling.stateEvent = True
+                if elt.rect.left <= chara.x + chara.rect.w and chara.x <= elt.rect.right:
+                    if velY != 0 and chara.rect.bottom <= elt.rect.top or velY != 0 and chara.rect.top >= elt.rect.bottom:
+                        if velY > 0 and chara.rect.bottom + velY >= elt.rect.top > chara.y:
+
+                            chara.walk = False
+                            Scrolling.stateEvent = False
+                            chara.y = elt.rect.top - chara.rect.h
+                        elif velY < 0 and chara.rect.top + velY <= elt.rect.bottom < chara.rect.bottom:
+                            chara.walk = False
+                            Scrolling.stateEvent = False
+                            chara.y = elt.rect.bottom
+                        else:
+                            chara.walk = True
+                            Scrolling.stateEvent = True
+                    if velX != 0 and chara.rect.bottom <= elt.rect.top or velX != 0 and chara.rect.top >= elt.rect.bottom:
+                        if chara.rect.bottom + velX >= elt.rect.top >= chara.rect.bottom:
+                            print('okkkkkkkkkkkkkkkkkkkkkkkkkk')
+                            chara.walk = True
+                            Scrolling.stateEvent = True
+                            chara.y = elt.rect.top - chara.rect.h
+                        if chara.rect.top - abs(velX) <= elt.rect.bottom < chara.rect.bottom:
+                            print('okkkkkkkkkkkkkkkkkkkkkkkkkk')
+                            chara.walk = True
+                            Scrolling.stateEvent = True
+                            chara.y = elt.rect.bottom
 
         level.draw(screen)
-
+        print(Scrolling.stateEvent)
         pygame.draw.rect(screen, green, characters[0].rect)
         pygame.draw.rect(screen, blue, characters[0].fakerect)
         pygame.draw.rect(screen, white, level.furnitures[0].rect)
         pygame.draw.rect(screen, red, level.furnitures[0].fakerect)
-        print("Postion x :", characters[0].x, "/n Position y :", characters[0].y)
+        print("Position x :", characters[0].x, "/n Position y :", characters[0].y)
         print(characters[0].VelX, characters[0].VelY)
         collision(characters[0], level.furnitures, characters[0].VelX, characters[0].VelY)
 
