@@ -160,8 +160,10 @@ def main():
     Game = Event()
     Scrolling = Event()
     Scrolling.stateEvent = True
-    axisX = Event()
-    axisY = Event()
+    ScrollingX = Event()
+    ScrollingY = Event()
+    ScrollingX.stateEvent = True
+    ScrollingY.stateEvent = True
 
     save = {}
     save["paramètres"] = option
@@ -229,7 +231,7 @@ def main():
         pygame.display.update()
 
     # définition de la fonction du jeu principal
-    def controles(level):
+    def controles(level, chara):
         global velX, velY
         pygame.event.set_allowed(pygame.KEYDOWN)
         # On associe keys pour gérer les touches plus efficacement
@@ -237,215 +239,136 @@ def main():
 
         # Commandes
         # Si les commandes sont activées
-        if Pops.commande_get():
+        if chara.commande_get():
+            if key[pygame.K_UP] and key[pygame.K_RIGHT]:
+                chara.VelX = chara.speed
+                chara.VelY = -chara.speed
+            elif key[pygame.K_RIGHT] and key[pygame.K_DOWN]:
+                chara.VelX = chara.speed
+                chara.VelY = chara.speed
             # Gauche
-            if key[pygame.K_LEFT] and Pops.x - Pops.width / 2 > level.PosX:
-                Pops.x -= Pops.speed
-                Pops.VelX = -Pops.speed
-                Pops.set_left()  # permet de figer le perso dans la dernière pose qu'il faisait
+            if key[pygame.K_LEFT] and chara.x - chara.width / 2 > level.PosX:
+                chara.x -= chara.speed
+                chara.VelX = -chara.speed
+                chara.set_left()  # permet de figer le perso dans la dernière pose qu'il faisait
                 # Si jamais d'autres touches sont pressées
                 # Bas
-                if key[pygame.K_DOWN] and Pops.y + Pops.height < level.PosY + level.height:
-                    Pops.y += Pops.speed
-                    Pops.VelY = Pops.speed
-                    Pops.set_front()
-
+                if key[pygame.K_DOWN] and chara.y + chara.height < level.PosY + level.height:
+                    chara.y += chara.speed
+                    chara.VelY = chara.speed
+                    chara.set_front()
+                    chara.VelY = chara.speed
                 # Haut
-                elif key[pygame.K_UP] and Pops.y > level.PosY:
-                    Pops.y -= Pops.speed
-                    Pops.set_back()
-                    Pops.VelY = -Pops.speed
-                Pops.walk = True
+                elif key[pygame.K_UP] and chara.y > level.PosY:
+                    chara.y -= chara.speed
+                    chara.set_back()
+                    chara.VelY = -chara.speed
+                chara.walk = True
             # Droite
-            elif key[pygame.K_RIGHT] and Pops.x < initialSPosX + level.width - (Pops.width + Pops.width / 2):
-                Pops.x += Pops.speed
-                Pops.VelX = Pops.speed
-                Pops.set_right()  # Aussi
-                if key[pygame.K_DOWN] and Pops.y + Pops.height < level.PosY + level.height:
-                    Pops.y += Pops.speed
-                    Pops.velY = Pops.speed
-                    Pops.set_front()
+            elif key[pygame.K_RIGHT] and chara.x < initialSPosX + level.width - (chara.width + chara.width / 2):
+                chara.x += chara.speed
+                chara.VelX = chara.speed
+                chara.set_right()  # Aussi
+                if key[pygame.K_DOWN] and chara.y + chara.height < level.PosY + level.height:
+                    chara.y += chara.speed
+                    chara.velY = chara.speed
+                    chara.set_front()
 
                 # Haut
-                elif key[pygame.K_UP] and Pops.y > level.PosY:
-                    Pops.y -= Pops.speed
-                    Pops.velY = -Pops.speed
-                    Pops.set_back()
-                Pops.walk = True
+                elif key[pygame.K_UP] and chara.y > level.PosY:
+                    chara.y -= chara.speed
+                    chara.velY = -chara.speed
+                    chara.set_back()
+                chara.walk = True
             # Bas
-            elif key[pygame.K_DOWN] and Pops.y + Pops.height < level.PosY + level.height:
-                Pops.y += Pops.speed
-                Pops.VelY = Pops.speed
-                Pops.set_front()
-                Pops.walk = True
+            elif key[pygame.K_DOWN] and chara.y + chara.height < level.PosY + level.height:
+                chara.y += chara.speed
+                chara.VelY = chara.speed
+                chara.set_front()
+                chara.walk = True
             # Haut
-            elif key[pygame.K_UP] and Pops.y > level.PosY:
-                Pops.y -= Pops.speed
-                Pops.VelY = -Pops.speed
-                Pops.set_back()
-                Pops.walk = True
-
+            elif key[pygame.K_UP] and chara.y > level.PosY:
+                chara.y -= chara.speed
+                chara.VelY = -chara.speed
+                chara.set_back()
+                chara.walk = True
             else:
-                Pops.walk = False
+                chara.walk = False
+
             if not key[pygame.K_RIGHT] and not key[pygame.K_LEFT]:
-                Pops.VelX = 0
+                chara.VelX = 0
             if not key[pygame.K_DOWN] and not key[pygame.K_UP]:
-                Pops.VelY = 0
+                chara.VelY = 0
             # Scrolling horizontal
-            if Pops.x < startScrollingX:
-                Pops.cameraX = Pops.x
+            if chara.x < startScrollingX:
+                chara.cameraX = chara.x
                 level.PosX = initialSPosX
 
-            elif Pops.x > stageLengthX - startScrollingX:
-                Pops.cameraX = Pops.x - stageLengthX + option.w
+            elif chara.x > stageLengthX - startScrollingX:
+                chara.cameraX = chara.x - stageLengthX + option.w
 
-            elif Pops.x >= startScrollingX:
-                Pops.cameraX = startScrollingX
+            elif chara.x >= startScrollingX:
+                chara.cameraX = startScrollingX
                 if Scrolling.stateEvent:
-                    if key[pygame.K_LEFT]:
-                        velX = -Pops.speed
-                    elif key[pygame.K_RIGHT]:
-                        velX = Pops.speed
-                    else:
-                        velX = 0
-                    level.PosX -= velX
+                    if ScrollingX.stateEvent:
+                        if key[pygame.K_LEFT]:
+                            velX = -chara.speed
+                        elif key[pygame.K_RIGHT]:
+                            velX = chara.speed
+                        else:
+                            velX = 0
+                        level.PosX -= velX
 
-            if Pops.y > startScrollingY:
-                Pops.cameraY = Pops.y
+            if chara.y > startScrollingY:
+                chara.cameraY = chara.y
                 level.PosY = initialSPosY
-            elif initialSPosY < Pops.y < initialSPosY + startScrollingY:
-                Pops.cameraY = Pops.y - initialSPosY
+            elif initialSPosY < chara.y < initialSPosY + startScrollingY:
+                chara.cameraY = chara.y - initialSPosY
             else:
-                Pops.cameraY = startScrollingY
+                chara.cameraY = startScrollingY
                 if Scrolling.stateEvent:
-                    if key[pygame.K_UP]:
-                        velY = -Pops.speed
-                    elif key[pygame.K_DOWN]:
-                        velY = Pops.speed
-                    else:
-                        velY = 0
-                    level.PosY -= velY
+                    if ScrollingY.stateEvent:
+                        if key[pygame.K_UP]:
+                            velY = -chara.speed
+                        elif key[pygame.K_DOWN]:
+                            velY = chara.speed
+                        else:
+                            velY = 0
+                        level.PosY -= velY
         else:
-            Pops.walk = False
+            chara.walk = False
+            Scrolling.stateEvent = False
 
     # fonction qui permet d'afficher la carte
     def printlevel(screen, level, characters):
-        # autre fonction qui permet de gérer les collisions
-        def collision(chara, furnitures, velX, velY):
-            # pour chaque objet sur la carte
-            for elt in furnitures:
-                # on vérifie les collisions
-                if pygame.sprite.collide_rect(chara, elt):
-                    # si l'axe en question est celle horizontale
-                    if velX != 0 and velY == 0:
-                        # s'il est à gauche de l'objet
-                        if elt.rect.left < chara.rect.right < elt.rect.right:
-                            # on pousse le joueur au bord de l'objet et on arrête le scrolling et la marche
-                            chara.x = elt.rect.left - chara.rect.w
-                            chara.walk = False
-                            Scrolling.stateEvent = False
-                            # s'il est à droite
-                        if chara.rect.left < elt.rect.right < chara.rect.right:
-                            # idem
-                            chara.x = elt.rect.right
-                            chara.walk = False
-                            Scrolling.stateEvent = False
-                    # si l'axe en question est celle verticale
-                    if velX == 0 and velY != 0:
-                        # s'il est en haut
-                        if chara.rect.bottom >= elt.rect.top and chara.x + chara.rect.w > elt.rect.left:
-                            chara.y = elt.rect.top - chara.rect.w
-                            chara.walk = False
-                            Scrolling.stateEvent = False
-                        # s'il est en bas
-                        if chara.rect.top <= elt.rect.bottom:
-                            chara.y = elt.rect.bottom
-                            chara.walk = False
-                            Scrolling.stateEvent = False
-
-                # si le joueur se situe sur les bords de l'objet
-                if elt.rect.bottom >= chara.y and chara.rect.bottom >= elt.rect.top:
-                    # s'il bouge horizontalement
-                    if velX != 0 and chara.rect.right <= elt.rect.left or velX != 0 and chara.rect.left >= elt.rect.right:
-                        # s'il est à gauche de l'objet
-                        if velX > 0 and chara.rect.right + velX >= elt.rect.left >= chara.x:
-                            chara.walk = False
-                            Scrolling.stateEvent = False
-                            chara.x = elt.rect.left - chara.rect.w
-                        # s'il est à droite
-                        elif velX < 0 and chara.rect.left + velX <= elt.rect.right and chara.x >= elt.rect.left:
-                            chara.walk = False
-                            Scrolling.stateEvent = False
-                            chara.x = elt.rect.right
-                        # s'il n'est pas proche de l'objet on ne fait rien
-                        else:
-                            chara.walk = True
-                            Scrolling.stateEvent = True
-                    # si on bouge verticalement sur les bords verticaux
-                    if velY != 0 and chara.rect.right <= elt.rect.left or velY != 0 and chara.rect.left >= elt.rect.right:
-                        # si on bouge
-                        if chara.rect.right + velX >= elt.rect.left >= chara.x:
-                            chara.walk = True
-                            Scrolling.stateEvent = True
-                            chara.x = elt.rect.left - chara.rect.w
-                        elif chara.rect.left + velX <= elt.rect.right and chara.x >= elt.rect.left:
-                            chara.walk = True
-                            Scrolling.stateEvent = True
-                            chara.x = elt.rect.right
-
-                if elt.rect.left <= chara.x + chara.rect.w and chara.x <= elt.rect.right:
-                    if velY != 0 and chara.rect.bottom <= elt.rect.top or velY != 0 and chara.rect.top >= elt.rect.bottom:
-                        if velY > 0 and chara.rect.bottom + velY >= elt.rect.top > chara.y:
-
-                            chara.walk = False
-                            Scrolling.stateEvent = False
-                            chara.y = elt.rect.top - chara.rect.h
-                        elif velY < 0 and chara.rect.top + velY <= elt.rect.bottom < chara.rect.bottom:
-                            chara.walk = False
-                            Scrolling.stateEvent = False
-                            chara.y = elt.rect.bottom
-                        else:
-                            chara.walk = True
-                            Scrolling.stateEvent = True
-                    if velX != 0 and chara.rect.bottom <= elt.rect.top or velX != 0 and chara.rect.top >= elt.rect.bottom:
-                        if chara.rect.bottom + velX >= elt.rect.top >= chara.rect.bottom:
-                            print('okkkkkkkkkkkkkkkkkkkkkkkkkk')
-                            chara.walk = True
-                            Scrolling.stateEvent = True
-                            chara.y = elt.rect.top - chara.rect.h
-                        if chara.rect.top - abs(velX) <= elt.rect.bottom < chara.rect.bottom:
-                            print('okkkkkkkkkkkkkkkkkkkkkkkkkk')
-                            chara.walk = True
-                            Scrolling.stateEvent = True
-                            chara.y = elt.rect.bottom
-
         level.draw(screen)
-        print(Scrolling.stateEvent)
-        pygame.draw.rect(screen, green, characters[0].rect)
-        pygame.draw.rect(screen, blue, characters[0].fakerect)
-        pygame.draw.rect(screen, white, level.furnitures[0].rect)
-        pygame.draw.rect(screen, red, level.furnitures[0].fakerect)
-        print("Position x :", characters[0].x, "/n Position y :", characters[0].y)
-        print(characters[0].VelX, characters[0].VelY)
-        collision(characters[0], level.furnitures, characters[0].VelX, characters[0].VelY)
+
+        for chara in characters:
+            chara.collision(level.furnitures, Scrolling, ScrollingX, ScrollingY)
 
         for elt in level.furnitures:
-            elt.draw(screen)
+            for chara in characters:
+                if elt.rect.center[1] <= chara.downrect.top:
+                    elt.draw(screen)
 
-        for charac in characters:
-            if charac.walk:
-                charac.walking(screen)
-
+        for chara in characters:
+            if chara.walk:
+                chara.walking(screen)
             else:
-                charac.standing(screen)
+                chara.standing(screen)
 
-                # boucle principale
+        for elt in level.furnitures:
+            for chara in characters:
+                if elt.rect.center[1] >= chara.uprect.bottom:
+                    elt.draw(screen)
 
+
+    # boucle principale
     while running:
 
         # Je bloque tous les évenements avec la souris car ils m'ont bien fait chier
         clock.tick_busy_loop(60)  # contrôle le nombre de frame du jeu
-
+        characters = pygame.sprite.Group(Pops)
         # event handling, gets all event from the event queue
         pygame.event.pump()
         for event in pygame.event.get():
@@ -457,20 +380,21 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_F4:
                     screen = option.dimension(screen)
-                # Si c'est pendant un dialogue :
-                if Pops.dialogue_get() or Fading.stateEvent:
-                    # On bloque les commandes
-                    Pops.set_commande(False)
-                if event.key == pygame.K_SPACE:
-                    # on active les dialogues45
-                    Pops.set_dialogue(True)
-                if event.key == pygame.K_ESCAPE:
-                    running = False
-                if event.key not in (pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT) and (
-                        Pops.animation_get() or Pops.finir):
-                    Pops.SInput = True
-                else:
-                    Pops.SInput = False
+                for sprite in characters:
+                    # Si c'est pendant un dialogue :
+                    if sprite.dialogue_get() or Fading.stateEvent:
+                        # On bloque les commandes
+                        sprite.set_commande(False)
+                    if event.key == pygame.K_SPACE:
+                        # on active les dialogues45
+                        sprite.set_dialogue(True)
+                    if event.key == pygame.K_ESCAPE:
+                        running = False
+                    if event.key not in (pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT) and (
+                            sprite.animation_get() or Pops.finir):
+                        sprite.SInput = True
+                    else:
+                        sprite.SInput = False
 
         if Menu.stateEvent:
             menu(font)
@@ -479,7 +403,7 @@ def main():
             charger = [Bar, *Bar.furnitures, Pops]
             fadetoblack(5, screen, [(font.render("Lancer jeu", False, red), 800, 400)], charger, Fading, Game)
         elif Game.stateEvent:
-            controles(Bar)
+            controles(Bar, Pops)
             # puis on affiche le sprite
             screen.fill(black)
             printlevel(screen, Bar, [Pops])
