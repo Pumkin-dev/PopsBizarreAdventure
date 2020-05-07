@@ -304,6 +304,7 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
                             self.walk = False
                             scrolling.stateEvent = False
                             self.x = elt.rect.right
+                            print('miaou')
                             collision = True
                         # s'il n'est pas proche de l'objet on ne fait rien
                         else:
@@ -410,6 +411,8 @@ class Scene:
         self.furnitures = []
         self.VelX = 0
         self.VelY = 0
+        self.lengthX = self.width + 2 * abs(self.initialPosX)
+        self.lenghtY = self.height + 2 * abs(self.initialPosY)
 
     def __iter__(self):
         return self

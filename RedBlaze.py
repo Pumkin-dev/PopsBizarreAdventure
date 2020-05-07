@@ -121,29 +121,23 @@ def main():
     # on prend la moitié de l'écran pour le début du scrolling 
     startScrollingX = option.mw
     startScrollingY = option.mh
-    initialSPosX = 500
-    initialSPosY = -300
 
-    Bar = Scene(bar, initialSPosX, initialSPosY)
-    stageLengthX = Bar.width + 2 * initialSPosX
-    stageLengthY = Bar.height + abs(initialSPosY) * 2
+    Bar = Scene(bar, 500, -300)
     table1 = loading("images/level/objects/table1.png")
     Table1 = Object(table1, Bar, 256, 716)
-    Table2 = Object(table1, Bar, 256 * 2 - 200, 716)
-    Table3 = Object(table1, Bar, 256 * 3, 716)
-
+    Table2 = Object(table1, Bar, 256*2, 716)
+    Table3 = Object(table1, Bar, 256*3, 716)
+    Bar.addFurnitures(Table1)
     Bar.addFurnitures(Table2)
     Bar.addFurnitures(Table3)
     # initialize the pygame module
     pygame.init()
     # On initialise le son (si jamais)
     pygame.mixer.init()
-    stageWidth, stageHeight = bar.get_rect().size
+
     startScrollingX = option.mw
     startScrollingY = option.mh
 
-    stageLengthX = stageWidth + 2 * initialSPosX
-    stageLengthY = stageHeight + abs(initialSPosY) * 2
     # active le module de texte
     pygame.font.init()
 
@@ -300,7 +294,7 @@ def main():
                     chara.VelY = -chara.speed
                 chara.walk = True
             # Droite
-            elif key[pygame.K_RIGHT] and chara.x < initialSPosX + level.width - (chara.width + chara.width / 2):
+            elif key[pygame.K_RIGHT] and chara.x < level.initialPosX + level.width - (chara.width + chara.width / 2):
                 chara.x += chara.speed
                 chara.VelX = chara.speed
                 chara.set_right()  # Aussi
@@ -337,10 +331,10 @@ def main():
             # Scrolling horizontal
             if chara.x < startScrollingX:
                 chara.cameraX = chara.x
-                level.PosX = initialSPosX
+                level.PosX = level.initialPosX
 
-            elif chara.x > stageLengthX - startScrollingX:
-                chara.cameraX = chara.x - stageLengthX + option.w
+            elif chara.x > level.lengthX - startScrollingX:
+                chara.cameraX = chara.x - level.lengthX + option.w
 
             elif chara.x >= startScrollingX:
                 chara.cameraX = startScrollingX
@@ -356,9 +350,9 @@ def main():
 
             if chara.y > startScrollingY:
                 chara.cameraY = chara.y
-                level.PosY = initialSPosY
-            elif initialSPosY < chara.y < initialSPosY + startScrollingY:
-                chara.cameraY = chara.y - initialSPosY
+                level.PosY = level.initialPosY
+            elif level.initialPosY < chara.y < level.initialPosY + startScrollingY:
+                chara.cameraY = chara.y - level.initialPosY
             else:
                 chara.cameraY = startScrollingY
                 if Scrolling.stateEvent:
