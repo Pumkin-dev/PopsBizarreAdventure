@@ -128,8 +128,12 @@ def main():
     stageLengthX = Bar.width + 2 * initialSPosX
     stageLengthY = Bar.height + abs(initialSPosY) * 2
     table1 = loading("images/level/objects/table1.png")
-    Table1 = Object(table1, Bar, 256, 500)
-    Bar.addFurnitures(Table1)
+    Table1 = Object(table1, Bar, 256, 716)
+    Table2 = Object(table1, Bar, 256 * 2 - 200, 716)
+    Table3 = Object(table1, Bar, 256 * 3, 716)
+
+    Bar.addFurnitures(Table2)
+    Bar.addFurnitures(Table3)
     # initialize the pygame module
     pygame.init()
     # On initialise le son (si jamais)
@@ -170,6 +174,36 @@ def main():
     save["joueur"] = Pops
 
     # définiton d'une fonction pour le menu principal au lancement du jeu
+    def game_intro():
+        # def pour vérifier le temps écoulé entre deux évents
+        def time(old_time, time_wanted):
+            # on actualise le temps
+            time = pygame.time.get_ticks()
+            # puis on calcule la durée
+            time = time - old_time
+
+            # si elle correspond à la durée voulue
+            if time == time_wanted:
+                # la vérification est vraie
+                return True
+            # sinon non
+            else:
+                return False
+
+        intro = True
+        first_time = pygame.time.get_ticks()
+        while intro:
+            for event in pygame.event.get():
+                # only do something if the event is of type QUIT
+                if event.type == pygame.QUIT:
+                    # change the value to False, to exit the main loop
+                    intro = False
+                    pygame.quit()
+            istime = time(first_time, 3000)
+            istime1 = time(first_time, 6000)
+            if istime:
+                fadetoblack(3, screen, [], (font.render("Un jeu par Hidéo Kojima", False, white), 400, 400))
+
     def menu(font):
         key = pygame.key.get_pressed()
         screen.fill(black)
@@ -229,6 +263,7 @@ def main():
                 fade.set_alpha(0)
                 bisfade.set_alpha(255)
         pygame.display.update()
+        return event, bisevent
 
     # définition de la fonction du jeu principal
     def controles(level, chara):
@@ -338,6 +373,10 @@ def main():
         else:
             chara.walk = False
             Scrolling.stateEvent = False
+        while chara.x % chara.speed != 0:
+            chara.x -= 1
+        while chara.y % chara.speed != 0:
+            chara.y -= 1
 
     # fonction qui permet d'afficher la carte
     def printlevel(screen, level, characters):
@@ -347,21 +386,25 @@ def main():
             chara.collision(level.furnitures, Scrolling, ScrollingX, ScrollingY)
 
         for elt in level.furnitures:
+            pygame.draw.rect(screen, green, elt.rect)
             for chara in characters:
                 if elt.rect.center[1] <= chara.downrect.top:
                     elt.draw(screen)
 
         for chara in characters:
+            pygame.draw.rect(screen, blue, chara.uprect)
+            pygame.draw.rect(screen, blue, chara.downrect)
             if chara.walk:
                 chara.walking(screen)
             else:
                 chara.standing(screen)
 
         for elt in level.furnitures:
+            pygame.draw.rect(screen, green, elt.rect)
             for chara in characters:
                 if elt.rect.center[1] >= chara.uprect.bottom:
                     elt.draw(screen)
-
+        print("x : ", characters[0].x, 'y : ', characters[0].y)
 
     # boucle principale
     while running:
@@ -412,7 +455,7 @@ def main():
                 # on active l'animation du texte avec pour paramètre le texte que l'on veut
                 animation_text(text, screen, Pops, dialogue_box, curseur, Bar)
                 # puis on met à jour l'écran
-            pygame.display.update()
+        pygame.display.update()
 
     pygame.quit()
 

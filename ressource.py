@@ -247,131 +247,142 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
         self.animation = state
 
     def collision(self, furnitures, scrolling, scrollingX, scrollingY):
+        collision = False
         # pour chaque objet sur la carte
         for elt in furnitures:
-            if elt.rect.center[1] <= self.downrect.top:
-                rect = self.downrect
-            else:
-                rect = self.uprect
-            # on vérifie les collisions
-            if elt.rect.colliderect(rect):
-                # si l'axe en question est celle horizontale
-                if self.VelX != 0:
-                    # s'il est à gauche de l'objet
-                    if elt.rect.left < rect.right < elt.rect.right:
-                        # on pousse le joueur au bord de l'objet et on arrête le scrolling et la marche
-                        self.x = elt.rect.left - rect.w
-                        rect.right = elt.rect.left
-                        self.walk = False
-                        scrolling.stateEvent = False
+            if not collision:
+                if elt.rect.center[1] <= self.downrect.top:
+                    rect = self.downrect
+                else:
+                    rect = self.uprect
+                # on vérifie les collisions
+                if elt.rect.colliderect(rect):
+                    # si l'axe en question est celle horizontale
+                    if self.VelX != 0:
+                        # s'il est à gauche de l'objet
+                        if elt.rect.left < rect.right < elt.rect.right:
+                            # on pousse le joueur au bord de l'objet et on arrête le scrolling et la marche
+                            self.x = elt.rect.left - rect.w
+                            rect.right = elt.rect.left
+                            self.walk = False
+                            scrolling.stateEvent = False
+                            # s'il est à droite
+                        if rect.left < elt.rect.right < rect.right:
+                            # idem
+                            self.x = rect.left = elt.rect.right
+                            self.walk = False
+                            scrolling.stateEvent = False
+                    # si l'axe en question est celle verticale
+                    if self.VelY != 0:
+                        # s'il est en haut
+                        if rect.bottom >= elt.rect.top and self.x + rect.w > elt.rect.left:
+                            self.y = elt.rect.top - rect.w
+                            rect.bottom = elt.rect.top
+                            self.walk = False
+                            scrolling.stateEvent = False
+                        # s'il est en bas
+                        if rect.top <= elt.rect.bottom:
+                            self.y = elt.rect.bottom
+                            rect.top = elt.rect.bottom
+                            self.walk = False
+                            scrolling.stateEvent = False
+                    collision = True
+                # si le joueur se situe sur les bords de l'objet à gauche ou à droite
+                if elt.rect.bottom >= rect.top and rect.bottom >= elt.rect.top:
+                    # s'il bouge horizontalement
+                    if self.VelX != 0 and rect.right <= elt.rect.left or self.VelX != 0 \
+                            and rect.left >= elt.rect.right:
+                        # s'il est à gauche de l'objet
+                        if self.VelX > 0 and rect.right + self.VelX >= elt.rect.left >= self.x:
+                            print("miaou")
+                            self.walk = False
+                            scrolling.stateEvent = False
+                            self.x = elt.rect.left - rect.w
+                            collision = True
                         # s'il est à droite
-                    if rect.left < elt.rect.right < rect.right:
-                        # idem
-                        self.x = rect.left = elt.rect.right
-                        self.walk = False
-                        scrolling.stateEvent = False
-                # si l'axe en question est celle verticale
-                if self.VelY != 0:
-                    # s'il est en haut
-                    if rect.bottom >= elt.rect.top and self.x + rect.w > elt.rect.left:
-                        self.y = elt.rect.top - rect.w
-                        rect.bottom = elt.rect.top
-                        self.walk = False
-                        scrolling.stateEvent = False
-                    # s'il est en bas
-                    if rect.top <= elt.rect.bottom:
-                        self.y = elt.rect.bottom
-                        rect.top = elt.rect.bottom
-                        self.walk = False
-                        scrolling.stateEvent = False
-
-            # si le joueur se situe sur les bords de l'objet à gauche ou à droite
-            if elt.rect.bottom >= rect.top and rect.bottom >= elt.rect.top:
-                # s'il bouge horizontalement
-                if self.VelX != 0 and rect.right <= elt.rect.left or self.VelX != 0 \
-                        and rect.left >= elt.rect.right:
-                    # s'il est à gauche de l'objet
-                    if self.VelX > 0 and rect.right + self.VelX >= elt.rect.left >= self.x:
-                        self.walk = False
-                        scrolling.stateEvent = False
-                        self.x = elt.rect.left - rect.w
-                    # s'il est à droite
-                    elif self.VelX < 0 and rect.left + self.VelX <= elt.rect.right and self.x >= elt.rect.left:
-                        self.walk = False
-                        scrolling.stateEvent = False
-                        self.x = elt.rect.right
-                    # s'il n'est pas proche de l'objet on ne fait rien
-                    else:
-                        self.walk = True
-                        scrolling.stateEvent = True
-                # si on bouge verticalement sur les bords verticaux
-                if self.VelY != 0 and rect.right <= elt.rect.left:
-
-                    # si on bouge à gauche
-                    if self.VelX >= 0 and rect.right + abs(self.VelX) >= elt.rect.left >= self.right:
-                        self.walk = True
-                        scrolling.stateEvent = True
-                        scrollingX.stateEvent = False
-                        rect.right = elt.rect.left
-                    else:
-                        scrollingX.stateEvent = True
-                if self.VelY != 0 and rect.left >= elt.rect.right:
-                    # si on bouge à droite
-                    if self.VelX <= 0 and rect.left - abs(self.VelX) <= elt.rect.right <= self.x:
-                        self.walk = True
-                        scrolling.stateEvent = True
-                        scrollingX.stateEvent = False
-                        self.x = elt.rect.right
-                    else:
-                        scrollingX.stateEvent = True
-            else:
-                scrollingX.stateEvent = True
-            # si on se situe en dessous ou au dessus de l'objet
-            if elt.rect.left <= rect.right and rect.left <= elt.rect.right:
-                # si on bouge verticalement
-                if self.VelY != 0 and rect.bottom <= elt.rect.top or self.VelY != 0 \
-                        and rect.top >= elt.rect.bottom:
-                    # si on bouge en haut de l'objet
-                    if self.VelY > 0 and rect.bottom + self.VelY >= elt.rect.top > self.y:
-                        self.walk = False
-                        scrolling.stateEvent = False
-                        self.y = elt.rect.top - rect.h
-                    # sinon si on bouge en dessous de l'objet
-                    elif self.VelY < 0 and rect.top + self.VelY <= elt.rect.bottom < rect.bottom:
-                        self.walk = False
-                        scrolling.stateEvent = False
-                        if elt.rect.center[1] <= rect.top:
-                            self.y = rect.top - 2 * rect.h
+                        elif self.VelX < 0 and rect.left + self.VelX <= elt.rect.right and self.x >= elt.rect.left:
+                            self.walk = False
+                            scrolling.stateEvent = False
+                            self.x = elt.rect.right
+                            collision = True
+                        # s'il n'est pas proche de l'objet on ne fait rien
                         else:
-                            self.y = elt.rect.bottom
-                    # si pas assez proche on ne fait rien
-                    else:
-                        self.walk = True
-                        scrolling.stateEvent = True
-                # si on bouge horizontalement sur les bords horizontaux
-                if self.VelX != 0 and rect.bottom <= elt.rect.top:
-                    # si c'est en haut
-                    if self.VelY >= 0 and rect.bottom + abs(self.VelY) >= elt.rect.top >= rect.bottom:
-                        self.walk = True
-                        scrolling.stateEvent = True
-                        scrollingY.stateEvent = False
-                        self.y = elt.rect.top - rect.h
-                    else:
-                        scrollingY.stateEvent = True
-                if self.VelX != 0 and rect.top >= elt.rect.bottom:
-                    # si c'est en bas
-                    if self.VelY <= 0 and rect.top - abs(self.VelY) <= elt.rect.bottom < rect.bottom:
-                        self.walk = True
-                        scrolling.stateEvent = True
-                        scrollingY.stateEvent = False
-                        if elt.rect.center[1] <= rect.top:
-                            self.y = rect.top - 2 * rect.h
+                            self.walk = True
+                            scrolling.stateEvent = True
+                    # si on bouge verticalement sur les bords verticaux
+                    if self.VelY != 0 and rect.right <= elt.rect.left:
+
+                        # si on bouge à gauche
+                        if self.VelX >= 0 and rect.right + abs(self.VelX) >= elt.rect.left >= self.right:
+                            self.walk = True
+                            scrolling.stateEvent = True
+                            scrollingX.stateEvent = False
+                            collision = True
+                            rect.right = elt.rect.left
                         else:
-                            self.y = elt.rect.bottom
-                    else:
-                        scrollingY.stateEvent = True
-            else:
-                scrollingY.stateEvent = True
+                            scrollingX.stateEvent = True
+                    if self.VelY != 0 and rect.left >= elt.rect.right:
+                        # si on bouge à droite
+                        if self.VelX <= 0 and rect.left - abs(self.VelX) <= elt.rect.right <= self.x:
+                            self.walk = True
+                            scrolling.stateEvent = True
+                            scrollingX.stateEvent = False
+                            collision = True
+                            self.x = elt.rect.right
+                        else:
+                            scrollingX.stateEvent = True
+                else:
+                    scrollingX.stateEvent = True
+                # si on se situe en dessous ou au dessus de l'objet
+                if elt.rect.left <= rect.right and rect.left <= elt.rect.right:
+                    # si on bouge verticalement
+                    if self.VelY != 0 and rect.bottom <= elt.rect.top or self.VelY != 0 \
+                            and rect.top >= elt.rect.bottom:
+                        # si on bouge en haut de l'objet
+                        if self.VelY > 0 and rect.bottom + self.VelY >= elt.rect.top > self.y:
+                            self.walk = False
+                            scrolling.stateEvent = False
+                            self.y = elt.rect.top - rect.h
+                            collision = True
+                        # sinon si on bouge en dessous de l'objet
+                        elif self.VelY < 0 and rect.top + self.VelY <= elt.rect.bottom < rect.bottom:
+                            self.walk = False
+                            scrolling.stateEvent = False
+                            collision = True
+                            if elt.rect.center[1] <= rect.top:
+                                self.y = rect.top - 2 * rect.h
+                            else:
+                                self.y = elt.rect.bottom
+                        # si pas assez proche on ne fait rien
+                        else:
+                            self.walk = True
+                            scrolling.stateEvent = True
+                    # si on bouge horizontalement sur les bords horizontaux
+                    if self.VelX != 0 and rect.bottom <= elt.rect.top:
+                        # si c'est en haut
+                        if self.VelY >= 0 and rect.bottom + abs(self.VelY) >= elt.rect.top >= rect.bottom:
+                            self.walk = True
+                            scrolling.stateEvent = True
+                            scrollingY.stateEvent = False
+                            self.y = elt.rect.top - rect.h
+                            collision = True
+                        else:
+                            scrollingY.stateEvent = True
+                    if self.VelX != 0 and rect.top >= elt.rect.bottom:
+                        # si c'est en bas
+                        if self.VelY <= 0 and rect.top - abs(self.VelY) <= elt.rect.bottom < rect.bottom:
+                            self.walk = True
+                            scrolling.stateEvent = True
+                            scrollingY.stateEvent = False
+                            collision = True
+                            if elt.rect.center[1] <= rect.top:
+                                self.y = rect.top - 2 * rect.h
+                            else:
+                                self.y = elt.rect.bottom
+                        else:
+                            scrollingY.stateEvent = True
+                else:
+                    scrollingY.stateEvent = True
 
 
 class Event:
@@ -386,7 +397,7 @@ class Event:
         self.stateEvent = state
 
 
-class Scene():
+class Scene:
 
     def __init__(self, picture, PosX, PosY):
         self.picture = picture
@@ -397,13 +408,13 @@ class Scene():
         self.initialPosX = PosX
         self.initialPosY = PosY
         self.furnitures = []
-        self.Sdx = 0
+        self.VelX = 0
+        self.VelY = 0
 
     def __iter__(self):
         return self
 
     def draw(self, screen):
-        self.oldX = self.PosX
         screen.blit(self.picture, (self.PosX, self.PosY))
         for elt in self.furnitures:
             elt.level = self
@@ -434,3 +445,12 @@ class Object(Scene, pygame.sprite.Sprite):
         self.PosY = self.level.PosY + self.ownY
         self.fakerect.x, self.fakerect.y = self.PosX, self.PosY
         screen.blit(self.picture, (self.PosX, self.PosY))
+
+class Inventory:
+    def __init__(self):
+        self.inventory = []
+
+
+class Item:
+    def __init__(self,picture,description):
+        self.picture
