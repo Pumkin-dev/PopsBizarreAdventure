@@ -378,6 +378,7 @@ def main():
 
         for chara in characters:
             chara.collision(level.furnitures, Scrolling, ScrollingX, ScrollingY)
+            print(chara.detection, chara.informationDetection)
 
         for elt in level.furnitures:
             pygame.draw.rect(screen, green, elt.rect)
@@ -387,7 +388,7 @@ def main():
 
         for chara in characters:
             pygame.draw.rect(screen, blue, chara.uprect)
-            pygame.draw.rect(screen, blue, chara.downrect)
+
             if chara.walk:
                 chara.walking(screen)
             else:

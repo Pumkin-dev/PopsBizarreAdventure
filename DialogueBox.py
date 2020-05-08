@@ -69,7 +69,7 @@ def structuration(text, font):
     return newtext
 
 
-def animation_text(text, screen, sprite, dialogue_box, curseur, level):
+def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialogue, nb_final, emotion):
     global dialogue_x, dialogue_y, first_x, first_y, rememberStrings, font
     global string
     global n, frame, p, factor, spaces, testline
@@ -78,20 +78,23 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level):
     pygame.event.clear()
     listwords = text.split(" ")
 
-    def face(screen, n, frame, face, frame_nb, PosX, PosY):
-        i = n % frame_nb
-        if i < 6:
-            frame = 0
-        elif 6 <= i < 18:
-            frame = 1
-        elif 18 <= i < 30:
-            frame = 2
-        elif 30 <= i < 42:
-            frame = 3
-        if i >= 42:
-            frame = 4
+    def face(screen, n, frame, face, frame_nb, PosX, PosY, emotion):
+        if emotion is None:
+            pass
+        else:
+            i = n % frame_nb
+            if i < 6:
+                frame = 0
+            elif 6 <= i < 18:
+                frame = 1
+            elif 18 <= i < 30:
+                frame = 2
+            elif 30 <= i < 42:
+                frame = 3
+            if i >= 42:
+                frame = 4
 
-        screen.blit(face[frame], (PosX, PosY))
+            screen.blit(face[frame], (PosX, PosY))
 
     DposX, DposY = 33, 500
 
@@ -104,7 +107,7 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level):
         if factor == len(rememberStrings):
             factor = 0
 
-    face(screen, n, frameP, sprite.bounce, 42, 980, 348)
+    face(screen, n, frameP, sprite.bounce, 42, 980, 348, emotion)
     # si les commandes sont actives
     if sprite.commande_get():
         # On les désactive et on active l'animation du texte
@@ -144,8 +147,12 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level):
             dialogue_x = first_x
             dialogue_y = first_y
             # et on désactive les dialogues et active les commandes
-            sprite.set_dialogue(False)
-            sprite.set_commande(True)
+            if nb_dialogue + 1 == nb_final:
+                sprite.set_dialogue(False)
+                sprite.set_commande(True)
+            else:
+                sprite.set_animation(True)
+            nb_dialogue += 1
             level.draw(screen)
             sprite.walking(screen)
         sprite.SInput = False
@@ -201,3 +208,5 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level):
         sprite.set_animation(False)
         sprite.finir = True
     # si animation désactivée
+    print("et là ?", nb_dialogue)
+    return nb_dialogue
