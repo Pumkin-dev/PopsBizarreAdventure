@@ -422,9 +422,8 @@ def main():
                     if sprite.dialogue_get() or Fading.stateEvent:
                         # On bloque les commandes
                         sprite.set_commande(False)
-                    if event.key == pygame.K_SPACE:
-                        # on active les dialogues45
-                        sprite.set_dialogue(True)
+                    else:
+                        Scrolling.stateEvent = True
                     if event.key == pygame.K_ESCAPE:
                         running = False
                     if event.key not in (pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT) and (

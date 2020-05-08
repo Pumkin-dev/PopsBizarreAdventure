@@ -293,14 +293,13 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
                     if self.VelX != 0 and rect.right <= elt.rect.left or self.VelX != 0 \
                             and rect.left >= elt.rect.right:
                         # s'il est à gauche de l'objet
-                        if self.VelX > 0 and rect.right + self.VelX >= elt.rect.left >= self.x:
-                            print("miaou")
+                        if self.VelX > 0 and rect.right + self.VelX >= elt.rect.left >= rect.right:
                             self.walk = False
                             scrolling.stateEvent = False
                             self.x = elt.rect.left - rect.w
                             collision = True
                         # s'il est à droite
-                        elif self.VelX < 0 and rect.left + self.VelX <= elt.rect.right and self.x >= elt.rect.left:
+                        elif self.VelX < 0 and rect.left + self.VelX <= elt.rect.right <= rect.left:
                             self.walk = False
                             scrolling.stateEvent = False
                             self.x = elt.rect.right
