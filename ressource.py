@@ -306,7 +306,6 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
                             self.walk = False
                             scrolling.stateEvent = False
                             self.x = elt.rect.right
-                            print('miaou')
                         # s'il n'est pas proche de l'objet on ne fait rien
                         else:
                             self.walk = True
@@ -314,13 +313,11 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
                     # si on bouge verticalement sur les bords verticaux
                     if self.VelY != 0 and rect.left < elt.rect.left:
                         # si on bouge à gauche de l'objet
-                        print(self.VelX)
                         if self.VelX >= 0 and rect.right + self.speed >= elt.rect.left >= self.x:
                             self.walk = True
                             scrolling.stateEvent = True
                             scrollingX.stateEvent = False
                             self.x = elt.rect.left - rect.w
-                            print('miaou')
                         else:
                             scrollingX.stateEvent = True
                     if self.VelY != 0 and rect.left >= elt.rect.right:
@@ -330,9 +327,9 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
                             scrolling.stateEvent = True
                             scrollingX.stateEvent = False
                             self.x = elt.rect.right
-                            print('miaou')
                         else:
                             scrollingX.stateEvent = True
+                        print(scrollingX.stateEvent)
                     if self.right and rect.right + self.speed >= elt.rect.left >= rect.right:
                         self.detection = True
                         collision = True

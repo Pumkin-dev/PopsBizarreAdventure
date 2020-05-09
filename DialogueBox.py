@@ -17,9 +17,6 @@ height = option.h
 dialogue_x = 50
 dialogue_y = 520
 pygame.display.init()
-# on garde les valeurs initiales dans d'autres variables
-first_x = dialogue_x
-first_y = dialogue_y
 # on crée une chaîne vide pour  conserver les anciennes lettres dans animation_text
 string = ""
 # les processus de passage et de fin sont de base désactivés
@@ -48,8 +45,7 @@ testline = ""
 
 
 # imprime la totalité du texte avec la syntaxe
-def structuration(text, font):
-    global first_x, first_y
+def structuration(text, font, first_x, first_y):
     dialogue_x, dialogue_y = first_x, first_y
     listword = text.split(" ")
     string = ""
@@ -70,12 +66,11 @@ def structuration(text, font):
 
 
 def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialogue, nb_final, emotion):
-    global dialogue_x, dialogue_y, first_x, first_y, rememberStrings, font
+    global dialogue_x, dialogue_y, rememberStrings, font
     global string
     global n, frame, p, factor, spaces, testline
     font = pygame.font.Font("VCR_OSD_MONO_1.001.ttf", 30)
     frameP = 0
-    pygame.event.clear()
     listwords = text.split(" ")
 
     def face(screen, n, frame, face, frame_nb, PosX, PosY, emotion):
@@ -96,7 +91,12 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
 
             screen.blit(face[frame], (PosX, PosY))
 
-    DposX, DposY = 33, 500
+    DposX  = 33
+    if sprite.y < int(option.h/2):
+        DposY = 500
+    else:
+        DposY = 500
+    first_x, first_y = DposX + 17, DposY + 20
 
     # on affiche la boite de dialogue
     screen.blit(dialogue_box, (DposX, DposY))
@@ -107,25 +107,27 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
         if factor == len(rememberStrings):
             factor = 0
 
-    face(screen, n, frameP, sprite.bounce, 42, 980, 348, emotion)
+    face(screen, n, frameP, sprite.bounce, 42, DposX + 947, DposY - 152, emotion)
     # si les commandes sont actives
     if sprite.commande_get():
         # On les désactive et on active l'animation du texte
         sprite.set_commande(False)
         sprite.set_animation(True)
+        dialogue_x = first_x
+        dialogue_y = first_y
 
     if not sprite.animation_get() and not sprite.passer:
         # si c'est la 60ème frame
         p = n % 60
         # on affiche tout le texte
-        for elt in structuration(text, font):
+        for elt in structuration(text, font, first_x, first_y):
             screen.blit(elt[0], elt[1])
         # puis on fait l'animation en 4 images
         if p < 15 or p >= 30 and p < 45:
             frame = 0
         elif p >= 15 and p < 30 or p >= 45:
             frame = 1
-        screen.blit(curseur[frame], (630, 685))
+        screen.blit(curseur[frame], (DposX + 585, DposY + 150))
         # puis on incrémente pour simuler les frames
         n += 1
 
@@ -143,7 +145,6 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
             rememberStrings = []
             spaces = 0
             sprite.finir = False
-            screen.fill(black)
             dialogue_x = first_x
             dialogue_y = first_y
             # et on désactive les dialogues et active les commandes
@@ -153,14 +154,12 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
             else:
                 sprite.set_animation(True)
             nb_dialogue += 1
-            level.draw(screen)
-            sprite.walking(screen)
         sprite.SInput = False
 
     # si processus de passage activé
     if sprite.passer:
         # on affiche le texte en entier
-        for elt in structuration(text, font):
+        for elt in structuration(text, font, first_x, first_y):
             screen.blit(elt[0], elt[1])
 
         # on désactive l'animation
@@ -171,7 +170,6 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
 
     # si le processus d'animation est activé    
     if sprite.animation_get():
-
         # puis on fait afficher les lettres déjà passées
         j = font.render(string, False, white)
         screen.blit(j, (first_x, dialogue_y))
@@ -208,5 +206,4 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
         sprite.set_animation(False)
         sprite.finir = True
     # si animation désactivée
-    print("et là ?", nb_dialogue)
     return nb_dialogue

@@ -166,6 +166,7 @@ def main():
     save = {}
     save["paramètres"] = option
     save["joueur"] = Pops
+    nb_dialogue = 0
 
     # définiton d'une fonction pour le menu principal au lancement du jeu
     def game_intro():
@@ -378,28 +379,22 @@ def main():
 
         for chara in characters:
             chara.collision(level.furnitures, Scrolling, ScrollingX, ScrollingY)
-            print(chara.detection, chara.informationDetection)
 
         for elt in level.furnitures:
-            pygame.draw.rect(screen, green, elt.rect)
             for chara in characters:
                 if elt.rect.center[1] <= chara.downrect.top:
                     elt.draw(screen)
 
         for chara in characters:
-            pygame.draw.rect(screen, blue, chara.uprect)
-
             if chara.walk:
                 chara.walking(screen)
             else:
                 chara.standing(screen)
 
         for elt in level.furnitures:
-            pygame.draw.rect(screen, green, elt.rect)
             for chara in characters:
                 if elt.rect.center[1] >= chara.uprect.bottom:
                     elt.draw(screen)
-        print("x : ", characters[0].x, 'y : ', characters[0].y)
 
     # boucle principale
     while running:
@@ -410,6 +405,7 @@ def main():
         # event handling, gets all event from the event queue
         pygame.event.pump()
         for event in pygame.event.get():
+
             # only do something if the event is of type QUIT
             if event.type == pygame.QUIT:
                 # change the value to False, to exit the main loop
@@ -425,6 +421,9 @@ def main():
                         sprite.set_commande(False)
                     else:
                         Scrolling.stateEvent = True
+
+                    if sprite.detection and event.unicode == "z":
+                        sprite.set_dialogue(True)
                     if event.key == pygame.K_ESCAPE:
                         running = False
                     if event.key not in (pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT) and (
@@ -442,13 +441,24 @@ def main():
         elif Game.stateEvent:
             controles(Bar, Pops)
             # puis on affiche le sprite
-            screen.fill(black)
+            if not Pops.dialogue_get():
+                screen.fill(black)
             printlevel(screen, Bar, [Pops])
+
             # si on actives les dialogues
             if Pops.dialogue_get():
-                # on active l'animation du texte avec pour paramètre le texte que l'on veut
-                animation_text(text, screen, Pops, dialogue_box, curseur, Bar)
-                # puis on met à jour l'écran
+                if Pops.informationDetection == Table1.rect:
+                    if nb_dialogue == 0:
+                        nb_dialogue = animation_text("Une simple banquette rouge avec une table.", screen, Pops,
+                                                     dialogue_box, curseur, Bar, nb_dialogue, 2, None)
+                    if nb_dialogue == 1:
+                        nb_dialogue = animation_text("... Hein ? Pourquoi des tasses sont servies s'il y a personne ? "
+                                                     + "En plus " + "elle sont vides...", screen, Pops, dialogue_box,
+                                                     curseur, Bar, nb_dialogue, 2, None)
+            else:
+                nb_dialogue = 0
+
+        # puis on met à jour l'écran
         pygame.display.update()
 
     pygame.quit()
