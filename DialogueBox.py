@@ -152,7 +152,7 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
                 sprite.set_dialogue(False)
                 sprite.set_commande(True)
             else:
-                sprite.set_animation(True)
+                sprite.set_commande(True)
             nb_dialogue += 1
         sprite.SInput = False
 
@@ -170,6 +170,7 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
 
     # si le processus d'animation est activé    
     if sprite.animation_get():
+        print("lol",string, text[n], text)
         # puis on fait afficher les lettres déjà passées
         j = font.render(string, False, white)
         screen.blit(j, (first_x, dialogue_y))
