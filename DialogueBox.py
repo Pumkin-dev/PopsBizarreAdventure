@@ -5,6 +5,7 @@ import pygame
 from ressource import Option
 
 n = 0
+m = 0
 p = 0
 frame = 0
 option = Option()
@@ -39,23 +40,40 @@ sfx_dialogue.set_volume(0.2)
 loading = pygame.image.load  # pour que ce soit plus rapide pour charger des images
 # et on charge les images nécessaires
 rememberStrings = []
-factor = 0
+factor = time1 = compteur = 0
 spaces = 0
 testline = ""
+comptedeframe = ""
+time1 = 0
+
+
+def istime(oldtime, timewanted):
+    if oldtime == 0:
+        return True
+    time = pygame.time.get_ticks()
+    time = time - oldtime
+    if time <= timewanted * 10 ** 3:
+        return False
+    else:
+        return True
 
 
 # imprime la totalité du texte avec la syntaxe
-def structuration(text, font, first_x, first_y):
+def structuration(text, font, first_x, first_y, limit):
     dialogue_x, dialogue_y = first_x, first_y
     listword = text.split(" ")
     string = ""
     newtext = []
     for i, elt in enumerate(listword):
+        print(elt)
         string += elt + " "
-        if font.size(string)[0] >= 980:
+        if font.size(string)[0] >= limit or elt == '\n':
             string = string.replace(elt, "")
             newtext.append((font.render(string, False, white), (dialogue_x, dialogue_y)))
-            string = elt + " "
+            if elt == '\n':
+                string = ""
+            else:
+                string = elt + " "
             dialogue_x = first_x
             dialogue_y += font.size(text)[1] + 2
 
@@ -66,17 +84,24 @@ def structuration(text, font, first_x, first_y):
 
 
 def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialogue, nb_final, emotion):
-    global dialogue_x, dialogue_y, rememberStrings, font
+    global dialogue_x, dialogue_y, rememberStrings, font, compteur
     global string
-    global n, frame, p, factor, spaces, testline
+    global n, m, frame, p, factor, spaces, testline, time1
+    global limit
     font = pygame.font.Font("VCR_OSD_MONO_1.001.ttf", 30)
     frameP = 0
     listwords = text.split(" ")
 
-    def face(screen, n, frame, face, frame_nb, PosX, PosY, emotion):
+    def face(screen, sprite, n, frame, frame_nb, PosX, PosY, emotion):
         if emotion is None:
             pass
         else:
+            if emotion == "bounce":
+                face = sprite.bounce
+            elif emotion == "dubitatif":
+                face = sprite.dubitatif
+            elif emotion == "dubitatif_bis":
+                face = sprite.dubitatif_bis
             i = n % frame_nb
             if i < 6:
                 frame = 0
@@ -91,11 +116,11 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
 
             screen.blit(face[frame], (PosX, PosY))
 
-    DposX  = 33
-    if sprite.y < int(option.h/2):
+    DposX = 33
+    if sprite.y < int(option.h / 2):
         DposY = 500
     else:
-        DposY = 500
+        DposY = 200
     first_x, first_y = DposX + 17, DposY + 20
 
     # on affiche la boite de dialogue
@@ -107,7 +132,7 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
         if factor == len(rememberStrings):
             factor = 0
 
-    face(screen, n, frameP, sprite.bounce, 42, DposX + 947, DposY - 152, emotion)
+    face(screen, sprite, n, frameP, 42, DposX + 947, DposY - 152, emotion)
     # si les commandes sont actives
     if sprite.commande_get():
         # On les désactive et on active l'animation du texte
@@ -120,7 +145,7 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
         # si c'est la 60ème frame
         p = n % 60
         # on affiche tout le texte
-        for elt in structuration(text, font, first_x, first_y):
+        for elt in structuration(text, font, first_x, first_y, limit):
             screen.blit(elt[0], elt[1])
         # puis on fait l'animation en 4 images
         if p < 15 or p >= 30 and p < 45:
@@ -140,6 +165,7 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
         elif sprite.finir:
             # on réinitialise les variables
             n = 0
+            m = 0
             string = ""
             testline = ""
             rememberStrings = []
@@ -159,7 +185,7 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
     # si processus de passage activé
     if sprite.passer:
         # on affiche le texte en entier
-        for elt in structuration(text, font, first_x, first_y):
+        for elt in structuration(text, font, first_x, first_y, limit):
             screen.blit(elt[0], elt[1])
 
         # on désactive l'animation
@@ -170,41 +196,84 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
 
     # si le processus d'animation est activé    
     if sprite.animation_get():
-        print("lol",string, text[n], text)
-        # puis on fait afficher les lettres déjà passées
-        j = font.render(string, False, white)
-        screen.blit(j, (first_x, dialogue_y))
-        # puis on ajoute la lettre suivante à string pour la réafficher à la prochaine frame
-        string += text[n]
-        # puis on affiche la prochaine lettre au coordonnées données
-        i = font.render(text[n], False, white)
-        screen.blit(i, (dialogue_x, dialogue_y))
-        if text[n] == " ":
-            if testline == "" and rememberStrings == []:
-                testline += listwords[0] + " "
-            spaces += 1
-            testline += listwords[spaces] + " "
-        # une frame sur quatre
-        if n % 4 == 0:
-            # jouer le son de texte
-            sfx_dialogue.play()
-        # on ajoute la taille d'un caractère pour donner l'impression
-        # que c'est comme dans un logiciel de traitement de texte
-        dialogue_x += font.size(text)[0] / len(text)
+        e = 0
+        mot = ""
+        if emotion is None:
+            limit = dialogue_box.get_rect().size[0]
+        else:
+            limit = DposX + 585
+        for i in listwords[spaces]:
+            if i == ".":
+                e += 1
 
-        if font.size(testline)[0] >= 980:
+        if font.size(testline)[0] >= limit or listwords[spaces] == '\n':
             dialogue_y += font.size(text)[1] + 2
             dialogue_x = first_x
             rememberStrings.append(string)
             string = ""
-            testline = listwords[spaces] + " "
-            # puis on incrémente pour simuler les frames
-        n += 1
+            if listwords[spaces] == '\n':
+                print("miaou")
+                testline = ""
+                spaces += 1
+                m += 2
+            else:
+                testline = listwords[spaces] + " "
+        # puis on fait afficher les lettres déjà passées
+        j = font.render(string, False, white)
+        screen.blit(j, (first_x, dialogue_y))
+        detection = istime(time1, 0.5)
+        if detection:
+            if e == 3:
+                if n % 5 == 0:
+                    if m in (n - 5, n, n + 5):
+                        compteur = m
 
-    # si la dernière lettre a été affichée
-    if n == len(text):
-        # on désactive le processus d'animation et on active le processus de fin
-        sprite.set_animation(False)
-        sprite.finir = True
-    # si animation désactivée
+                    # puis on ajoute la lettre suivante à string pour la réafficher à la prochaine frame
+                    string += text[m]
+                    # puis on affiche la prochaine lettre au coordonnées données
+                    i = font.render(text[m], False, white)
+                    screen.blit(i, (dialogue_x, dialogue_y))
+                    if text[m] == " ":
+                        if testline == "" and rememberStrings == []:
+                            testline += listwords[0] + " "
+                        spaces += 1
+                        testline += listwords[spaces] + " "
+                    # on ajoute la taille d'un caractère pour donner l'impression
+                    # que c'est comme dans un logiciel de traitement de texte
+                    dialogue_x += font.size(text)[0] / len(text)
+                    m += 1
+                    test = m - compteur
+                    if test == 3:
+                        time1 = pygame.time.get_ticks()
+            else:
+                n = m
+                # puis on ajoute la lettre suivante à string pour la réafficher à la prochaine frame
+                string += text[m]
+                # puis on affiche la prochaine lettre au coordonnées données
+                i = font.render(text[m], False, white)
+                screen.blit(i, (dialogue_x, dialogue_y))
+                if text[m] == " ":
+                    if testline == "" and rememberStrings == []:
+                        testline += listwords[0] + " "
+                    spaces += 1
+                    testline += listwords[spaces] + " "
+                # on ajoute la taille d'un caractère pour donner l'impression
+                # que c'est comme dans un logiciel de traitement de texte
+                dialogue_x += font.size(text)[0] / len(text)
+
+            # une frame sur quatre
+            if n % 4 == 0:
+                # jouer le son de texte
+                sfx_dialogue.play()
+            # puis on incrémente pour simuler les frames
+            n += 1
+            if not e == 3:
+                m += 1
+
+        # si la dernière lettre a été affichée
+        if m == len(text):
+            # on désactive le processus d'animation et on active le processus de fin
+            sprite.set_animation(False)
+            sprite.finir = True
+        # si animation désactivée
     return nb_dialogue

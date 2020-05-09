@@ -57,6 +57,8 @@ def main():
     RWrightpops = []
     RWleftpops = []
     bouncepops = []
+    dubitatifpops = []
+    dubitatif_bispops = []
     for i in range(6):
         frontpops.append(loading("images/sprite_standing/front/normal/front{}.png".format(i + 1)).convert_alpha())
 
@@ -88,6 +90,10 @@ def main():
 
     for i in range(4):
         bouncepops.append(loading("images/dialogue/face_discussion/bounce/bounce{}.png ".format(i + 1)).convert_alpha())
+        dubitatifpops.append(loading("images/dialogue/face_discussion"
+                                     +"/dubitatif/dubitatif{}.png ".format(i + 1)).convert_alpha())
+        dubitatif_bispops.append(loading("images/dialogue/face_discussion"
+                                          + "/dubitatif2/dubitatif_bis{}.png ".format(i + 1)).convert_alpha())
 
     bar = loading("images/level/background/bar.png").convert_alpha()
     dialogue_box = loading("images/dialogue/dialogue_box.png").convert()
@@ -115,7 +121,9 @@ def main():
                  RWfrontpops,
                  RWrightpops,
                  RWleftpops,
-                 bouncepops)  # toutes les caractéristiques de Pops
+                 bouncepops,
+                 dubitatifpops,
+                 dubitatif_bispops)  # toutes les caractéristiques de Pops
 
     # toutes les caractéristiques pour le scrolling
     # on prend la moitié de l'écran pour le début du scrolling 
@@ -447,14 +455,22 @@ def main():
 
             # si on actives les dialogues
             if Pops.dialogue_get():
-                if Pops.informationDetection == Table1.rect:
+                if Pops.informationDetection in (Table1, Table3, Table2):
                     if nb_dialogue == 0:
                         nb_dialogue = animation_text("Une simple banquette rouge avec une table.", screen, Pops,
-                                                     dialogue_box, curseur, Bar, nb_dialogue, 2, None)
+                                                     dialogue_box, curseur, Bar, nb_dialogue, 4, None)
                     if nb_dialogue == 1:
-                        nb_dialogue = animation_text("... Hein ? Pourquoi des tasses sont servies s'il y a personne ? "
-                                                     + "En plus " + "elle sont vides...", screen, Pops, dialogue_box,
-                                                     curseur, Bar, nb_dialogue, 2, None)
+                        nb_dialogue = animation_text("... Hein ? Pourquoi des tasses sont servies s'il y a personne ?"
+                                                     + " \n "
+                                                     + "En plus elles sont vides ...", screen, Pops, dialogue_box,
+                                                     curseur, Bar, nb_dialogue, 4, None)
+                    if nb_dialogue == 2:
+                        nb_dialogue = animation_text("Que c'est stupide.", screen, Pops, dialogue_box,curseur, Bar, nb_dialogue, 4,
+                                                     None)
+                    if nb_dialogue == 3:
+                        nb_dialogue = animation_text("...", screen, Pops, dialogue_box,curseur, Bar, nb_dialogue, 4,
+                                                     "dubitatif")
+
             else:
                 nb_dialogue = 0
 

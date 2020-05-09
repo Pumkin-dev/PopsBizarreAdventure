@@ -59,7 +59,9 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
                  RWfront,
                  RWright,
                  RWleft,
-                 bounce):
+                 bounce,
+                 dubitatif,
+                 dubitatif_bis):
         pygame.sprite.Sprite.__init__(self)
 
         self.x = x
@@ -108,7 +110,10 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
         self.downrect = pygame.Rect(self.x, self.y + 2 * int(heightP / 3), widthP, int(heightP / 3))
         self.rect.x = self.x
         self.rect.y = self.y
+
         self.bounce = bounce
+        self.dubitatif = dubitatif
+        self.dubitatif_bis = dubitatif_bis
 
     def __iter__(self):
         return self
