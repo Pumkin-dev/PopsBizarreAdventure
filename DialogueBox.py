@@ -120,7 +120,7 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
     if sprite.y < int(option.h / 2):
         DposY = 500
     else:
-        DposY = 200
+        DposY = 150
     first_x, first_y = DposX + 17, DposY + 20
 
     # on affiche la boite de dialogue

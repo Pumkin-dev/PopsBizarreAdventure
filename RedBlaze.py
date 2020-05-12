@@ -12,8 +12,8 @@ myappid = 'mycompany.myproduct.subproduct.version'
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 import pygame
-from ressource import Chara, Event, Option, Scene, Object
-from DialogueBox import animation_text
+from ressource import Chara, Handler, Option, Scene, Object
+from DialogueBox import animation_text, istime
 
 
 # définition d'une fonction qui lance le menu principal au lancement du jeu
@@ -91,9 +91,9 @@ def main():
     for i in range(4):
         bouncepops.append(loading("images/dialogue/face_discussion/bounce/bounce{}.png ".format(i + 1)).convert_alpha())
         dubitatifpops.append(loading("images/dialogue/face_discussion"
-                                     +"/dubitatif/dubitatif{}.png ".format(i + 1)).convert_alpha())
+                                     + "/dubitatif/dubitatif{}.png ".format(i + 1)).convert_alpha())
         dubitatif_bispops.append(loading("images/dialogue/face_discussion"
-                                          + "/dubitatif2/dubitatif_bis{}.png ".format(i + 1)).convert_alpha())
+                                         + "/dubitatif2/dubitatif_bis{}.png ".format(i + 1)).convert_alpha())
 
     bar = loading("images/level/background/bar.png").convert_alpha()
     dialogue_box = loading("images/dialogue/dialogue_box.png").convert()
@@ -133,8 +133,8 @@ def main():
     Bar = Scene(bar, 500, -300)
     table1 = loading("images/level/objects/table1.png")
     Table1 = Object(table1, Bar, 256, 716)
-    Table2 = Object(table1, Bar, 256*2, 716)
-    Table3 = Object(table1, Bar, 256*3, 716)
+    Table2 = Object(table1, Bar, 256 * 2, 716)
+    Table3 = Object(table1, Bar, 256 * 3, 716)
     Bar.addFurnitures(Table1)
     Bar.addFurnitures(Table2)
     Bar.addFurnitures(Table3)
@@ -160,16 +160,17 @@ def main():
     # Objet qui permet de contrôler le nombre de frame et le temps
     clock = pygame.time.Clock()
 
-    Menu = Event()
-    Menu.stateEvent = True
-    Fading = Event()
-    Game = Event()
-    Scrolling = Event()
+    Menu = Handler()
+    Fading = Handler()
+    Game = Handler()
+    Scrolling = Handler()
     Scrolling.stateEvent = True
-    ScrollingX = Event()
-    ScrollingY = Event()
+    ScrollingX = Handler()
+    ScrollingY = Handler()
     ScrollingX.stateEvent = True
     ScrollingY.stateEvent = True
+    Intro = Handler()
+    Intro.stateEvent = True
 
     save = {}
     save["paramètres"] = option
@@ -177,37 +178,51 @@ def main():
     nb_dialogue = 0
 
     # définiton d'une fonction pour le menu principal au lancement du jeu
-    def game_intro():
-        # def pour vérifier le temps écoulé entre deux évents
-        def time(old_time, time_wanted):
-            # on actualise le temps
-            time = pygame.time.get_ticks()
-            # puis on calcule la durée
-            time = time - old_time
-
-            # si elle correspond à la durée voulue
-            if time == time_wanted:
-                # la vérification est vraie
-                return True
-            # sinon non
-            else:
-                return False
-
+    def game_intro(running):
         intro = True
-        first_time = pygame.time.get_ticks()
+        time1 = 0
+        compteur = 0
+        text1 = font.render("Un jeu pas réalisé par Hideo Kojima", False, white)
+        text2 = font.render("et par Yoko Taro, Masahiro Sakurai, et encore moins David Cage", False, white)
         while intro:
+            print(Menu.stateEvent, Pops.SInput, compteur)
+            pygame.event.pump()
             for event in pygame.event.get():
                 # only do something if the event is of type QUIT
                 if event.type == pygame.QUIT:
                     # change the value to False, to exit the main loop
                     intro = False
-                    pygame.quit()
-            istime = time(first_time, 3000)
-            istime1 = time(first_time, 6000)
-            if istime:
-                fadetoblack(3, screen, [], (font.render("Un jeu par Hidéo Kojima", False, white), 400, 400))
+                    running = False
+                    Intro.stateEvent = False
+                if event.type == pygame.KEYDOWN:
+                    if not event.key in (pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT, pygame.K_LEFT):
+                        Pops.SInput = True
+                    else:
+                        Pops.SInput = False
+            if not Pops.SInput and compteur == 0:
+                compteur = fadetoblack(5, screen, [],
+                                      [(text1, 370,
+                                        380)], Fading,
+                                        Menu, compteur)
+                if compteur == 1:
+                    time1 = pygame.time.get_ticks()
 
-    def menu(font):
+            elif istime(time1, 1) and compteur == 1 or Pops.SInput and compteur == 1:
+                compteur = fadetoblack(5, screen, [(text1, 370, 380)],
+                                           [(text2, 100, 380)], Fading,
+                                           Menu, compteur)
+
+                if compteur == 2:
+                    time1 = pygame.time.get_ticks()
+            elif istime(time1, 1) and compteur == 2:
+                intro = menu(font, intro)
+                if not intro:
+                    Game.stateEvent = True
+
+            pygame.display.update()
+        return running
+
+    def menu(font, event):
         key = pygame.key.get_pressed()
         screen.fill(black)
         # remplir le fond de la couleur
@@ -219,15 +234,16 @@ def main():
             if click:
                 Fading.stateEvent = True
                 Menu.stateEvent = False
+                event = False
 
         else:
             screen.blit(font.render("Lancer jeu", False, white), (800, 400))
-
+        return event
         pygame.display.update()
 
         # def d'une fonction qui permet de faire un fondu en noir
 
-    def fadetoblack(speed, screen, ancient, new, event, bisevent):
+    def fadetoblack(speed, screen, ancient, new, event, bisevent, compteur):
         nonlocal fade, bisfade
         pygame.event.set_blocked(pygame.KEYDOWN)
         if fade.get_alpha() < 255:
@@ -247,6 +263,7 @@ def main():
             # on  active le processus inverse
         # si processus inverse activé
         elif bisfade.get_alpha() > 0 and fade.get_alpha() == 255:
+
             # on baisse alpha
             for elt in new:
                 if isinstance(elt, (Scene, Object)):
@@ -263,10 +280,12 @@ def main():
                 # on désactive le processus
                 event.stateEvent = False
                 bisevent.stateEvent = True
+                compteur += 1
+                print(compteur)
                 fade.set_alpha(0)
                 bisfade.set_alpha(255)
         pygame.display.update()
-        return event, bisevent
+        return compteur
 
     # définition de la fonction du jeu principal
     def controles(level, chara):
@@ -439,14 +458,11 @@ def main():
                         sprite.SInput = True
                     else:
                         sprite.SInput = False
+        if Intro.stateEvent:
+            running = game_intro(running)
 
-        if Menu.stateEvent:
-            menu(font)
+        if Game.stateEvent:
 
-        elif Fading.stateEvent:
-            charger = [Bar, *Bar.furnitures, Pops]
-            fadetoblack(5, screen, [(font.render("Lancer jeu", False, red), 800, 400)], charger, Fading, Game)
-        elif Game.stateEvent:
             controles(Bar, Pops)
             # puis on affiche le sprite
             if not Pops.dialogue_get():
@@ -455,25 +471,26 @@ def main():
 
             # si on actives les dialogues
             if Pops.dialogue_get():
+                Scrolling.stateEvent = False
                 if Pops.informationDetection in (Table1, Table3, Table2):
                     if nb_dialogue == 0:
                         nb_dialogue = animation_text("Une simple banquette rouge avec une table.", screen, Pops,
                                                      dialogue_box, curseur, Bar, nb_dialogue, 4, None)
                     if nb_dialogue == 1:
                         nb_dialogue = animation_text("... Hein ? Pourquoi des tasses sont servies s'il y a personne ?"
-                                                     + " \n "
+                                                     + " /n "
                                                      + "En plus elles sont vides ...", screen, Pops, dialogue_box,
                                                      curseur, Bar, nb_dialogue, 4, None)
                     if nb_dialogue == 2:
-                        nb_dialogue = animation_text("Que c'est stupide.", screen, Pops, dialogue_box,curseur, Bar, nb_dialogue, 4,
+                        nb_dialogue = animation_text("Que c'est stupide.", screen, Pops, dialogue_box, curseur, Bar,
+                                                     nb_dialogue, 4,
                                                      None)
                     if nb_dialogue == 3:
-                        nb_dialogue = animation_text("...", screen, Pops, dialogue_box,curseur, Bar, nb_dialogue, 4,
+                        nb_dialogue = animation_text("...", screen, Pops, dialogue_box, curseur, Bar, nb_dialogue, 4,
                                                      "dubitatif")
 
             else:
                 nb_dialogue = 0
-
         # puis on met à jour l'écran
         pygame.display.update()
 

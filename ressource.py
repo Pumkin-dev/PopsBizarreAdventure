@@ -398,7 +398,7 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
                     scrollingY.stateEvent = True
 
 
-class Event:
+class Handler:
 
     def __init__(self):
         self.stateEvent = False
