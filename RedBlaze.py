@@ -185,7 +185,6 @@ def main():
         text1 = font.render("Un jeu pas réalisé par Hideo Kojima", False, white)
         text2 = font.render("et par Yoko Taro, Masahiro Sakurai, et encore moins David Cage", False, white)
         while intro:
-            print(Menu.stateEvent, Pops.SInput, compteur)
             pygame.event.pump()
             for event in pygame.event.get():
                 # only do something if the event is of type QUIT
@@ -195,10 +194,15 @@ def main():
                     running = False
                     Intro.stateEvent = False
                 if event.type == pygame.KEYDOWN:
-                    if not event.key in (pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT, pygame.K_LEFT):
+                    if event.key == pygame.K_ESCAPE:
+                        intro = False
+                        running = False
+                        Intro.stateEvent = False
+                    elif not event.key in (pygame.K_DOWN, pygame.K_UP, pygame.K_RIGHT, pygame.K_LEFT):
                         Pops.SInput = True
                     else:
                         Pops.SInput = False
+
             if not Pops.SInput and compteur == 0:
                 compteur = fadetoblack(5, screen, [],
                                       [(text1, 370,
@@ -207,7 +211,7 @@ def main():
                 if compteur == 1:
                     time1 = pygame.time.get_ticks()
 
-            elif istime(time1, 1) and compteur == 1 or Pops.SInput and compteur == 1:
+            elif istime(time1, 1) and compteur == 1:
                 compteur = fadetoblack(5, screen, [(text1, 370, 380)],
                                            [(text2, 100, 380)], Fading,
                                            Menu, compteur)
@@ -215,14 +219,27 @@ def main():
                 if compteur == 2:
                     time1 = pygame.time.get_ticks()
             elif istime(time1, 1) and compteur == 2:
-                intro = menu(font, intro)
-                if not intro:
-                    Game.stateEvent = True
+                compteur = fadetoblack(5, screen, [(text2, 100, 380)],
+                                       [(font.render("Lancer jeu",False, white), 800, 400)], Fading,
+                                       Menu, compteur)
+                if compteur == 3:
+                    Fading.stateEvent = True
+                    time1 = pygame.time.get_ticks()
+
+            elif compteur == 3 and Intro.stateEvent:
+                menu(font)
+
+            if Fading.stateEvent and not Intro.stateEvent:
+                fadetoblack(5, screen, [(font.render("Lancer jeu", False, red), 800, 400)],
+                            [Bar, *Bar.furnitures, Pops], Fading,
+                            Menu, compteur)
+                if not Fading.stateEvent:
+                    intro = False
 
             pygame.display.update()
         return running
 
-    def menu(font, event):
+    def menu(font):
         key = pygame.key.get_pressed()
         screen.fill(black)
         # remplir le fond de la couleur
@@ -234,11 +251,10 @@ def main():
             if click:
                 Fading.stateEvent = True
                 Menu.stateEvent = False
-                event = False
+                Intro.stateEvent = False
 
         else:
             screen.blit(font.render("Lancer jeu", False, white), (800, 400))
-        return event
         pygame.display.update()
 
         # def d'une fonction qui permet de faire un fondu en noir
@@ -460,6 +476,8 @@ def main():
                         sprite.SInput = False
         if Intro.stateEvent:
             running = game_intro(running)
+        else:
+            Game.stateEvent = True
 
         if Game.stateEvent:
 
@@ -491,6 +509,7 @@ def main():
 
             else:
                 nb_dialogue = 0
+        print('miaou')
         # puis on met à jour l'écran
         pygame.display.update()
 
