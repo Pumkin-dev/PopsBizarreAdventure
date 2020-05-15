@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # Module pour toutes les animations en tout genre
 import pygame
@@ -65,7 +66,6 @@ def structuration(text, font, first_x, first_y, limit):
     string = ""
     newtext = []
     for i, elt in enumerate(listword):
-        print(elt)
         string += elt + " "
         if font.size(string)[0] >= limit or elt == '\n':
             string = string.replace(elt, "")
@@ -91,7 +91,6 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
     font = pygame.font.Font("VCR_OSD_MONO_1.001.ttf", 30)
     frameP = 0
     listwords = text.split(" ")
-
     def face(screen, sprite, n, frame, frame_nb, PosX, PosY, emotion):
         if emotion is None:
             pass
@@ -120,8 +119,13 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
     if sprite.y < int(option.h / 2):
         DposY = 500
     else:
-        DposY = 150
+        DposY = 200
     first_x, first_y = DposX + 17, DposY + 20
+
+    if emotion is None:
+        limit = dialogue_box.get_rect().size[0]
+    else:
+        limit = DposX + 585
 
     # on affiche la boite de dialogue
     screen.blit(dialogue_box, (DposX, DposY))
@@ -194,7 +198,7 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
         sprite.passer = False
         sprite.finir = True
 
-    # si le processus d'animation est activé    
+    # si le processus d'animation est activé
     if sprite.animation_get():
         e = 0
         mot = ""
@@ -207,12 +211,14 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
                 e += 1
 
         if font.size(testline)[0] >= limit or listwords[spaces] == '\n':
+            print('maiou')
             dialogue_y += font.size(text)[1] + 2
             dialogue_x = first_x
             rememberStrings.append(string)
             string = ""
+
             if listwords[spaces] == '\n':
-                print("miaou")
+                print('miaou')
                 testline = ""
                 spaces += 1
                 m += 2
@@ -221,6 +227,7 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
         # puis on fait afficher les lettres déjà passées
         j = font.render(string, False, white)
         screen.blit(j, (first_x, dialogue_y))
+        print(listwords[spaces], spaces)
         detection = istime(time1, 0.5)
         if detection:
             if e == 3:
