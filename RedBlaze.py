@@ -237,7 +237,6 @@ def main():
         else:
             screen.blit(font.render("Lancer jeu", False, white), (800, 400))
         pygame.display.update()
-        print("sdld", Pops.commande_get())
         # def d'une fonction qui permet de faire un fondu en noir
 
     def fadetoblack(speed, screen, ancient, new, event, bisevent, compteur):
@@ -408,6 +407,8 @@ def main():
             for chara in characters:
                 if elt.rect.center[1] <= chara.downrect.top:
                     elt.draw(screen)
+                else:
+                    level.draw(screen)
 
         for chara in characters:
             if chara.walk:
@@ -442,7 +443,6 @@ def main():
                     if sprite.dialogue_get() or Fading.stateEvent:
                         if event.key not in (pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT):
                             sprite.SInput = True
-                            print("Vrai ta mère")
                         else:
                             sprite.SInput = False
                     else:
@@ -451,6 +451,7 @@ def main():
 
                     if sprite.detection and event.unicode == "z":
                         sprite.set_dialogue(True)
+                        Scrolling.stateEvent = False
                     if event.key == pygame.K_ESCAPE:
                         running = False
                     if event.key == pygame.K_UP:

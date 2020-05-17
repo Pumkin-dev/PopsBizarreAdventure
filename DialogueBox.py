@@ -211,14 +211,12 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
                 e += 1
 
         if font.size(testline)[0] >= limit or listwords[spaces] == '\n':
-            print('maiou')
             dialogue_y += font.size(text)[1] + 2
             dialogue_x = first_x
             rememberStrings.append(string)
             string = ""
 
             if listwords[spaces] == '\n':
-                print('miaou')
                 testline = ""
                 spaces += 1
                 m += 2
@@ -227,7 +225,6 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
         # puis on fait afficher les lettres déjà passées
         j = font.render(string, False, white)
         screen.blit(j, (first_x, dialogue_y))
-        print(listwords[spaces], spaces)
         detection = istime(time1, 0.5)
         if detection:
             if e == 3:
