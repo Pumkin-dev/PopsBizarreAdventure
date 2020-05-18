@@ -155,8 +155,6 @@ def main():
     # define a variable to control the main loop
     running = True
 
-    # Textes pour tester les boites de dialogues
-    text = "Mais comment veux-tu que je rentre chez moi ? J'ai pété ma voiture lol me faudra au moins 2 mois."
     # Objet qui permet de contrôler le nombre de frame et le temps
     clock = pygame.time.Clock()
 
@@ -192,6 +190,12 @@ def main():
                                        Menu, compteur)
             if compteur == 1:
                 time1 = pygame.time.get_ticks()
+        elif Pops.SInput and compteur == 0:
+            fade.set_alpha(255)
+            bisfade.set_alpha(0)
+            Pops.SInput = False
+            compteur += 1
+            screen.fill(black)
 
         elif istime(time1, 1) and compteur == 1:
             compteur = fadetoblack(5, screen, [(text1, 370, 380)],
@@ -200,10 +204,22 @@ def main():
 
             if compteur == 2:
                 time1 = pygame.time.get_ticks()
+        elif Pops.SInput and compteur == 1:
+            fade.set_alpha(255)
+            bisfade.set_alpha(0)
+            Pops.SInput = False
+            compteur += 1
+            screen.fill(black)
         elif istime(time1, 1) and compteur == 2:
             compteur = fadetoblack(5, screen, [(text2, 100, 380)],
                                        [(font.render("Lancer jeu", False, white), 800, 400)], Game,
                                        Menu, compteur)
+        elif Pops.SInput and compteur == 2:
+            fade.set_alpha(255)
+            bisfade.set_alpha(0)
+            Pops.SInput = False
+            compteur += 1
+            screen.fill(black)
         if compteur == 3:
             Fading.stateEvent = True
 
@@ -240,7 +256,9 @@ def main():
 
     def fadetoblack(speed, screen, ancient, new, event, bisevent, compteur):
         nonlocal fade, bisfade
-        pygame.event.set_blocked(pygame.KEYDOWN)
+        if fade.get_alpha() >= 255 and bisfade.get_alpha() <= 0:
+            fade.set_alpha(0)
+            bisfade.set_alpha(255)
         if fade.get_alpha() < 255:
             for elt in ancient:
                 if isinstance(elt, (Scene, Object)):
@@ -257,7 +275,7 @@ def main():
 
             # on  active le processus inverse
         # si processus inverse activé
-        elif bisfade.get_alpha() > 0 and fade.get_alpha() == 255:
+        elif bisfade.get_alpha() > 0 and fade.get_alpha() >= 255:
 
             # on baisse alpha
             for elt in new:
@@ -438,12 +456,12 @@ def main():
                 # change the value to False, to exit the main loop
                 running = False
             # Si une touche est pressée ...
-            elif event.type == pygame.KEYDOWN:
+            elif event.type in (pygame.KEYDOWN, pygame.KEYUP):
                 if event.key == pygame.K_F4:
                     screen = option.dimension(screen)
                 for sprite in characters:
                     # Si c'est pendant un dialogue :
-                    if sprite.dialogue_get() or Fading.stateEvent:
+                    if sprite.dialogue_get() or Fading.stateEvent or Intro.stateEvent:
                         if event.key not in (pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT):
                             sprite.SInput = True
                         else:
@@ -452,7 +470,7 @@ def main():
                         Scrolling.stateEvent = True
                         sprite.set_commande(True)
 
-                    if sprite.detection and event.unicode == "z":
+                    if sprite.detection and event.type == pygame.KEYDOWN and event.unicode == "z":
                         sprite.set_dialogue(True)
                         Scrolling.stateEvent = False
                     if event.key == pygame.K_ESCAPE:
@@ -461,6 +479,7 @@ def main():
                         position -= 1
                     elif event.key == pygame.K_DOWN:
                         position += 1
+                
         if Intro.stateEvent:
             position, compteur, time1 = game_intro(screen, position, compteur, time1)
         else:
@@ -496,10 +515,9 @@ def main():
 
             else:
                 nb_dialogue = 0
-        print(Pops.x, Pops.y)
         # puis on met à jour l'écran
         pygame.display.update()
-
+        print(Pops.SInput, events)
     pygame.quit()
 
 
