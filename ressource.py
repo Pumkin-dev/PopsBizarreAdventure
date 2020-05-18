@@ -404,6 +404,97 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
                     scrollingY.stateEvent = True
 
 
+class PNJ(Chara, pygame.sprite.Sprite):
+
+    def __init__(self, x, y, widthP, heightP, speed, level,
+                 front,
+                 back,
+                 right,
+                 left,
+                 Wfront,
+                 Wright,
+                 Wleft,
+                 Rfront,
+                 Rback,
+                 Rright,
+                 Rleft,
+                 RWfront,
+                 RWright,
+                 RWleft,
+                 bounce,
+                 dubitatif,
+                 dubitatif_bis):
+        pygame.sprite.Sprite.__init__(self)
+
+        Chara.__init__(self, x, y, widthP, heightP, speed,
+                       front,
+                       back,
+                       right,
+                       left,
+                       Wfront,
+                       Wright,
+                       Wleft,
+                       Rfront,
+                       Rback,
+                       Rright,
+                       Rleft,
+                       RWfront,
+                       RWright,
+                       RWleft,
+                       bounce,
+                       dubitatif,
+                       dubitatif_bis)
+
+        self.level = level
+        self.ownX = self.x - level.PosX
+        self.ownY = self.y - level.PosY
+
+    def standing(self, screen):
+        Chara.standing(self, screen)
+
+    def walking(self, screen):
+        Chara.walking(self, screen)
+
+    def set_right(self):
+        Chara.set_right(self)
+
+    def set_left(self):
+        Chara.set_left(self)
+
+    def set_front(self):
+        Chara.set_front(self)
+
+    def set_front(self):
+        Chara.set_front(self)
+
+    def set_dialogue(self, state):
+        Chara.set_dialogue(self, state)
+
+    def set_animation(self, state):
+        Chara.set_animation(self, state)
+
+    def set_level(self, level, ownX, ownY):
+        self.level = level
+        self.ownX = ownX
+        self.ownY = ownY
+
+    def set_commande(self, state):
+        Chara.set_commande(self, state)
+
+    def dialogue_get(self):
+        return self.dialogue
+
+    def commande_get(self):
+        return self.commande
+
+    def animation_get(self):
+        return self.animation
+
+    def update(self, ):
+        self.x = self.level.PosX + self.ownX
+        self.y = self.level.PosY + self.ownY
+
+
 class Handler:
 
     def __init__(self):

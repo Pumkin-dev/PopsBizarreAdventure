@@ -12,7 +12,7 @@ myappid = 'mycompany.myproduct.subproduct.version'
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 import pygame
-from ressource import Chara, Handler, Option, Scene, Object
+from ressource import Chara, PNJ, Handler, Option, Scene, Object
 from DialogueBox import animation_text, istime
 
 
@@ -59,34 +59,43 @@ def main():
     bouncepops = []
     dubitatifpops = []
     dubitatif_bispops = []
+    frontfalo = []
+    rightfalo = []
+    leftfalo = []
     for i in range(6):
-        frontpops.append(loading("images/sprite_standing/front/normal/front{}.png".format(i + 1)).convert_alpha())
+        frontpops.append(loading("images/chara/pops/sprite_standing/front/normal/front{}.png".format(i + 1)).convert_alpha())
 
-        backpops.append(loading("images/sprite_standing/back/back{}.png".format(i + 1)).convert_alpha())
+        backpops.append(loading("images/chara/pops/sprite_standing/back/back{}.png".format(i + 1)).convert_alpha())
 
-        rightpops.append(loading("images/sprite_standing/right/normal/right{}.png".format(i + 1)).convert_alpha())
+        rightpops.append(loading("images/chara/pops/sprite_standing/right/normal/right{}.png".format(i + 1)).convert_alpha())
 
-        leftpops.append(loading("images/sprite_standing/left/normal/left{}.png".format(i + 1)).convert_alpha())
+        leftpops.append(loading("images/chara/pops/sprite_standing/left/normal/left{}.png".format(i + 1)).convert_alpha())
 
-        Wfrontpops.append(loading("images/sprite_standing/front/wink/front{}.png".format(i + 1)).convert_alpha())
+        Wfrontpops.append(loading("images/chara/pops/sprite_standing/front/wink/front{}.png".format(i + 1)).convert_alpha())
 
-        Wrightpops.append(loading("images/sprite_standing/right/wink/right{}.png".format(i + 1)).convert_alpha())
+        Wrightpops.append(loading("images/chara/pops/sprite_standing/right/wink/right{}.png".format(i + 1)).convert_alpha())
 
-        Wleftpops.append(loading("images/sprite_standing/left/wink/left{}.png".format(i + 1)).convert_alpha())
+        Wleftpops.append(loading("images/chara/pops/sprite_standing/left/wink/left{}.png".format(i + 1)).convert_alpha())
 
-        Rfrontpops.append(loading("images/sprite_walking/front/normal/front{}.png".format(i + 1)).convert_alpha())
+        Rfrontpops.append(loading("images/chara/pops/sprite_walking/front/normal/front{}.png".format(i + 1)).convert_alpha())
 
-        Rbackpops.append(loading("images/sprite_walking/back/back{}.png".format(i + 1)).convert_alpha())
+        Rbackpops.append(loading("images/chara/pops/sprite_walking/back/back{}.png".format(i + 1)).convert_alpha())
 
-        Rrightpops.append(loading("images/sprite_walking/right/normal/right{}.png".format(i + 1)).convert_alpha())
+        Rrightpops.append(loading("images/chara/pops/sprite_walking/right/normal/right{}.png".format(i + 1)).convert_alpha())
 
-        Rleftpops.append(loading("images/sprite_walking/left/normal/left{}.png".format(i + 1)).convert_alpha())
+        Rleftpops.append(loading("images/chara/pops/sprite_walking/left/normal/left{}.png".format(i + 1)).convert_alpha())
 
-        RWfrontpops.append(loading("images/sprite_walking/front/wink/front{}.png".format(i + 1)).convert_alpha())
+        RWfrontpops.append(loading("images/chara/pops/sprite_walking/front/wink/front{}.png".format(i + 1)).convert_alpha())
 
-        RWrightpops.append(loading("images/sprite_walking/right/wink/right{}.png".format(i + 1)).convert_alpha())
+        RWrightpops.append(loading("images/chara/pops/sprite_walking/right/wink/right{}.png".format(i + 1)).convert_alpha())
 
-        RWleftpops.append(loading("images/sprite_walking/left/wink/left{}.png".format(i + 1)).convert_alpha())
+        RWleftpops.append(loading("images/chara/pops/sprite_walking/left/wink/left{}.png".format(i + 1)).convert_alpha())
+
+        frontfalo.append(loading("images/chara/falo/sprite_standing/front/front{}.png".format(i + 1)))
+
+        leftfalo.append(loading("images/chara/falo/sprite_standing/left/left{}.png".format(i + 1)))
+
+        rightfalo.append(loading("images/chara/falo/sprite_standing/right/right{}.png".format(i + 1)))
 
     for i in range(4):
         bouncepops.append(loading("images/dialogue/face_discussion/bounce/bounce{}.png ".format(i + 1)).convert_alpha())
@@ -125,19 +134,30 @@ def main():
                  dubitatifpops,
                  dubitatif_bispops)  # toutes les caractéristiques de Pops
 
+
     # toutes les caractéristiques pour le scrolling
     # on prend la moitié de l'écran pour le début du scrolling 
     startScrollingX = option.mw
     startScrollingY = option.mh
 
     Bar = Scene(bar, 500, -300)
-    table1 = loading("images/level/objects/table1.png")
+    table1 = loading("images/level/objects/table1.png").convert_alpha()
+    comptoir1 = loading("images/level/objects/comptoir1.png").convert_alpha()
+    comptoir2 = loading("images/level/objects/comptoir2.png").convert_alpha()
+    comptoir3 = loading("images/level/objects/comptoir3.png").convert_alpha()
+    comptoir4 = loading("images/level/objects/comptoir4.png").convert_alpha()
+    Comptoir1 = Object(comptoir1, Bar, 310, 410)
+    Comptoir2 = Object(comptoir2, Bar, 310 + Comptoir1.rect.w, 410)
+    Comptoir3 = Object(comptoir3, Bar, 310 + Comptoir1.rect.w + Comptoir2.rect.w, 410)
+    Comptoir4 = Object(comptoir4, Bar, 310 + Comptoir1.rect.w + Comptoir2.rect.w + Comptoir3.rect.w, 350)
     Table1 = Object(table1, Bar, 256, 716)
     Table2 = Object(table1, Bar, 256 * 2, 716)
     Table3 = Object(table1, Bar, 256 * 3, 716)
-    Bar.addFurnitures(Table1)
-    Bar.addFurnitures(Table2)
-    Bar.addFurnitures(Table3)
+    for elt in (Comptoir1, Comptoir2, Comptoir3, Comptoir4, Table1, Table2, Table3):
+        Bar.addFurnitures(elt)
+    Falo = PNJ(253, 366, *frontfalo[0].get_rect().size, Pops.speed, Bar, frontfalo, frontfalo, rightfalo, leftfalo,
+               frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo
+               , frontfalo, frontfalo, frontfalo, frontfalo)
     # initialize the pygame module
     pygame.init()
     # On initialise le son (si jamais)
@@ -182,7 +202,7 @@ def main():
     def game_intro(screen, position, compteur, time1):
         text1 = font.render("Un jeu pas réalisé par Hideo Kojima", False, white)
         text2 = font.render("et par Yoko Taro, Masahiro Sakurai, et encore moins David Cage", False, white)
-
+        print(Pops.SInput, compteur)
         if not Pops.SInput and compteur == 0:
             compteur = fadetoblack(5, screen, [],
                                        [(text1, 370,
@@ -194,6 +214,7 @@ def main():
             fade.set_alpha(255)
             bisfade.set_alpha(0)
             Pops.SInput = False
+            print("ét lp", Pops.SInput)
             compteur += 1
             screen.fill(black)
 
@@ -210,6 +231,7 @@ def main():
             Pops.SInput = False
             compteur += 1
             screen.fill(black)
+            print("étzazaz lp", Pops.SInput)
         elif istime(time1, 1) and compteur == 2:
             compteur = fadetoblack(5, screen, [(text2, 100, 380)],
                                        [(font.render("Lancer jeu", False, white), 800, 400)], Game,
@@ -220,6 +242,7 @@ def main():
             Pops.SInput = False
             compteur += 1
             screen.fill(black)
+        print(Pops.SInput,"c")
         if compteur == 3:
             Fading.stateEvent = True
 
@@ -233,6 +256,7 @@ def main():
             if not Fading.stateEvent:
                 Intro.stateEvent = False
         return position, compteur, time1
+        print(Pops.SInput,'té')
 
     def menu(font, position):
         position = position % 1
@@ -302,7 +326,7 @@ def main():
 
     # définition de la fonction du jeu principal
     def controles(level, chara):
-        global velX, velY
+        global velX, velY, PNJ
         pygame.event.set_allowed(pygame.KEYDOWN)
         # On associe keys pour gérer les touches plus efficacement
         key = pygame.key.get_pressed()
@@ -416,7 +440,8 @@ def main():
             chara.x -= 1
         while chara.y % chara.speed != 0:
             chara.y -= 1
-
+        for elt in pnj:
+            elt.update()
     # fonction qui permet d'afficher la carte
     def printlevel(screen, level, characters):
         level.draw(screen)
@@ -428,8 +453,6 @@ def main():
             for chara in characters:
                 if elt.rect.center[1] <= chara.downrect.top:
                     elt.draw(screen)
-                else:
-                    level.draw(screen)
 
         for chara in characters:
             if chara.walk:
@@ -447,9 +470,11 @@ def main():
 
         # Je bloque tous les évenements avec la souris car ils m'ont bien fait chier
         clock.tick_busy_loop(60)  # contrôle le nombre de frame du jeu
-        characters = pygame.sprite.Group(Pops)
+        characters = pygame.sprite.Group(Pops, Falo)
+        pnj = pygame.sprite.Group(Falo)
         # event handling, gets all event from the event queue
         events = pygame.event.get()
+        print(Pops.SInput,'dd')
         for event in events:
             # only do something if the event is of type QUIT
             if event.type == pygame.QUIT:
@@ -479,7 +504,7 @@ def main():
                         position -= 1
                     elif event.key == pygame.K_DOWN:
                         position += 1
-                
+        print(Pops.SInput,'dfsdf')
         if Intro.stateEvent:
             position, compteur, time1 = game_intro(screen, position, compteur, time1)
         else:
@@ -491,7 +516,7 @@ def main():
             controles(Bar, Pops)
             # puis on affiche le sprite
             screen.fill(black)
-            printlevel(screen, Bar, [Pops])
+            printlevel(screen, Bar, characters)
 
             # si on actives les dialogues
             if Pops.dialogue_get():
