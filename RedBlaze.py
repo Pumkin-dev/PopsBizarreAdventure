@@ -217,7 +217,6 @@ def main():
             if not Fading.stateEvent:
                 Intro.stateEvent = False
         return position, compteur, time1
-        pygame.display.update()
 
     def menu(font, position):
         position = position % 1
@@ -371,6 +370,8 @@ def main():
                         else:
                             velX = 0
                         level.PosX -= velX
+                        while level.PosY % chara.speed != 0:
+                            level.PosY -= 1
 
             if chara.y > startScrollingY:
                 chara.cameraY = chara.y
@@ -388,6 +389,8 @@ def main():
                         else:
                             velY = 0
                         level.PosY -= velY
+                        while level.PosY % chara.speed != 0:
+                            level.PosY -= 1
         else:
             chara.walk = False
             Scrolling.stateEvent = False
@@ -420,7 +423,7 @@ def main():
             for chara in characters:
                 if elt.rect.center[1] >= chara.uprect.bottom:
                     elt.draw(screen)
-
+        pygame.draw.rect(screen, red, Pops.uprect)
     # boucle principale
     while running:
 
@@ -468,8 +471,7 @@ def main():
 
             controles(Bar, Pops)
             # puis on affiche le sprite
-            if not Pops.dialogue_get():
-                screen.fill(black)
+            screen.fill(black)
             printlevel(screen, Bar, [Pops])
 
             # si on actives les dialogues
@@ -494,6 +496,7 @@ def main():
 
             else:
                 nb_dialogue = 0
+        print(Pops.x, Pops.y)
         # puis on met à jour l'écran
         pygame.display.update()
 
