@@ -29,10 +29,6 @@ class Option:
 
 option = Option()
 
-nP = 0
-
-frameP = 0
-
 pygame.display.init()
 
 # ratio qui aide à redimensionner tous les éléments graphiques
@@ -117,94 +113,95 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
         self.dubitatif = dubitatif
         self.dubitatif_bis = dubitatif_bis
 
+        self.n = 0
+        self.frame = 0
+
     def __iter__(self):
         return self
 
     def standing(self, screen):  # frame à l'image quand il marche sur la carte
-        global frameP, nP
 
         # affiche le sprite de face et etc grâce aux valeurs
         # données par la rubriques Commandes dans PopsBizarreAdventure.py
 
-        nP = nP % 208  # toutes les 208 frames
+        self.n = self.n % 208  # toutes les 208 frames
 
-        if nP % 52 < 11:
-            frameP = 0
-        elif 12 <= nP % 52 < 23:
-            frameP = 1
-        elif 24 <= nP % 52 < 29:
-            frameP = 2
-        elif 30 <= nP % 52 < 35:
-            frameP = 3
-        elif 36 <= nP % 52 < 41:
-            frameP = 4
-        elif 42 <= nP % 52 < 53:
-            frameP = 5
-        nP += 1
+        if self.n % 52 < 11:
+            self.frame = 0
+        elif 12 <= self.n % 52 < 23:
+            self.frame = 1
+        elif 24 <= self.n % 52 < 29:
+            self.frame = 2
+        elif 30 <= self.n % 52 < 35:
+            self.frame = 3
+        elif 36 <= self.n % 52 < 41:
+            self.frame = 4
+        elif 42 <= self.n % 52 < 53:
+            self.frame = 5
+        self.n += 1
 
         if self.front:
-            if nP <= 156:
-                screen.blit(self.picfront[frameP], (self.cameraX, self.cameraY))
+            if self.n <= 156:
+                screen.blit(self.picfront[self.frame], (self.cameraX, self.cameraY))
             else:
-                screen.blit(self.picWfront[frameP], (self.cameraX, self.cameraY))
+                screen.blit(self.picWfront[self.frame], (self.cameraX, self.cameraY))
 
         elif self.right:
-            if nP <= 156:
-                screen.blit(self.picright[frameP], (self.cameraX, self.cameraY))
+            if self.n <= 156:
+                screen.blit(self.picright[self.frame], (self.cameraX, self.cameraY))
             else:
-                screen.blit(self.picWright[frameP], (self.cameraX, self.cameraY))
+                screen.blit(self.picWright[self.frame], (self.cameraX, self.cameraY))
 
         elif self.back:
-            screen.blit(self.picback[frameP], (self.cameraX, self.cameraY))
+            screen.blit(self.picback[self.frame], (self.cameraX, self.cameraY))
 
         elif self.left:
-            if nP <= 156:
-                screen.blit(self.picleft[frameP], (self.cameraX, self.cameraY))
+            if self.n <= 156:
+                screen.blit(self.picleft[self.frame], (self.cameraX, self.cameraY))
             else:
-                screen.blit(self.picWleft[frameP], (self.cameraX, self.cameraY))
-                if nP == 208:
-                    nP = 0
+                screen.blit(self.picWleft[self.frame], (self.cameraX, self.cameraY))
+                if self.n == 208:
+                    self.n = 0
 
     def walking(self, screen):
-        global nP, frameP
-        nP = nP % 216  # toutes les 208 frames
+        self.n = self.n % 216  # toutes les 208 frames
 
-        if nP % 54 < 9:
-            frameP = 0
-        elif 9 <= nP % 54 < 18:
-            frameP = 1
-        elif 18 <= nP % 54 < 27:
-            frameP = 2
-        elif 27 <= nP % 54 < 36:
-            frameP = 3
-        elif 36 <= nP % 54 < 45:
-            frameP = 4
-        elif 45 <= nP % 54 < 54:
-            frameP = 5
-        nP += 1
+        if self.n % 54 < 9:
+            self.frame = 0
+        elif 9 <= self.n % 54 < 18:
+            self.frame = 1
+        elif 18 <= self.n % 54 < 27:
+            self.frame = 2
+        elif 27 <= self.n % 54 < 36:
+            self.frame = 3
+        elif 36 <= self.n % 54 < 45:
+            self.frame = 4
+        elif 45 <= self.n % 54 < 54:
+            self.frame = 5
+        self.n += 1
 
         if self.front:
-            if nP <= 156:
-                screen.blit(self.picRfront[frameP], (self.cameraX, self.cameraY))
+            if self.n <= 156:
+                screen.blit(self.picRfront[self.frame], (self.cameraX, self.cameraY))
             else:
-                screen.blit(self.picRWfront[frameP], (self.cameraX, self.cameraY))
+                screen.blit(self.picRWfront[self.frame], (self.cameraX, self.cameraY))
 
         elif self.right:
-            if nP <= 156:
-                screen.blit(self.picRright[frameP], (self.cameraX, self.cameraY))
+            if self.n <= 156:
+                screen.blit(self.picRright[self.frame], (self.cameraX, self.cameraY))
             else:
-                screen.blit(self.picRWright[frameP], (self.cameraX, self.cameraY))
+                screen.blit(self.picRWright[self.frame], (self.cameraX, self.cameraY))
 
         elif self.back:
-            screen.blit(self.picRback[frameP], (self.cameraX, self.cameraY))
+            screen.blit(self.picRback[self.frame], (self.cameraX, self.cameraY))
 
         elif self.left:
-            if nP <= 156:
-                screen.blit(self.picRleft[frameP], (self.cameraX, self.cameraY))
+            if self.n <= 156:
+                screen.blit(self.picRleft[self.frame], (self.cameraX, self.cameraY))
             else:
-                screen.blit(self.picRWleft[frameP], (self.cameraX, self.cameraY))
-                if nP == 208:
-                    nP = 0
+                screen.blit(self.picRWleft[self.frame], (self.cameraX, self.cameraY))
+                if self.n == 208:
+                    self.n = 0
         self.rect.x = self.x
         self.rect.y = self.y
         self.uprect.x, self.uprect.y = self.x, self.y

@@ -35,7 +35,7 @@ pygame.display.init()
 pygame.mixer.init()
 
 # on charge le son de lecture des textes
-sfx_dialogue = pygame.mixer.Sound("text.wav")
+sfx_dialogue = pygame.mixer.Sound("sound/SFX/text.wav")
 # et on baisse le son
 sfx_dialogue.set_volume(0.2)
 loading = pygame.image.load  # pour que ce soit plus rapide pour charger des images
