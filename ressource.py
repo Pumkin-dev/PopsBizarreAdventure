@@ -40,7 +40,7 @@ loading = pygame.image.load
 
 class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sprite rapidement
 
-    def __init__(self, x, y, widthP, heightP, speed,
+    def __init__(self,
                  front,
                  back,
                  right,
@@ -60,15 +60,7 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
                  dubitatif_bis):
         pygame.sprite.Sprite.__init__(self)
 
-        self.x = x
-        self.y = y
-        self.oldx = self.x
-        self.oldy = self.y
-        self.width = widthP
-        self.height = heightP
-        self.speed = speed
-        self.VelY = 0
-        self.VelX = 0
+        self.width, self.height = front[0].get_rect().size
 
         self.front = True
         self.back = False
@@ -84,9 +76,6 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
         self.SInput = False
         self.detection = False
         self.informationDetection = None
-
-        self.cameraX = self.x
-        self.cameraY = self.y
 
         self.picfront = front
         self.picback = back
@@ -104,10 +93,6 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
         self.picRWleft = RWleft
 
         self.rect = front[0].get_rect()
-        self.uprect = pygame.Rect(self.x, self.y, widthP, 2 * int(heightP / 3))
-        self.downrect = pygame.Rect(self.x, self.y + 2 * int(heightP / 3), widthP, int(heightP / 3))
-        self.rect.x = self.x
-        self.rect.y = self.y
 
         self.bounce = bounce
         self.dubitatif = dubitatif
@@ -120,9 +105,6 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
         return self
 
     def standing(self, screen):  # frame à l'image quand il marche sur la carte
-
-        # affiche le sprite de face et etc grâce aux valeurs
-        # données par la rubriques Commandes dans PopsBizarreAdventure.py
 
         self.n = self.n % 208  # toutes les 208 frames
 
@@ -401,9 +383,9 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
                     scrollingY.stateEvent = True
 
 
-class PNJ(Chara, pygame.sprite.Sprite):
+class Player(Chara, pygame.sprite.Sprite):
 
-    def __init__(self, x, y, widthP, heightP, speed, level,
+    def __init__(self, x, y, speed,
                  front,
                  back,
                  right,
@@ -422,9 +404,7 @@ class PNJ(Chara, pygame.sprite.Sprite):
                  dubitatif,
                  dubitatif_bis):
         pygame.sprite.Sprite.__init__(self)
-
-        Chara.__init__(self, x, y, widthP, heightP, speed,
-                       front,
+        Chara.__init__(self, front,
                        back,
                        right,
                        left,
@@ -442,9 +422,17 @@ class PNJ(Chara, pygame.sprite.Sprite):
                        dubitatif,
                        dubitatif_bis)
 
-        self.level = level
-        self.ownX = self.x - level.PosX
-        self.ownY = self.y - level.PosY
+        self.x, self.y = x, y
+        self.cameraX, self.cameraY = self.x, self.y
+        self.oldx = self.x
+        self.oldy = self.y
+        self.speed = speed
+        self.VelY = 0
+        self.VelX = 0
+        self.uprect = pygame.Rect(self.x, self.y, self.width, 2 * int(self.height / 3))
+        self.downrect = pygame.Rect(self.x, self.y + 2 * int(self.height / 3), self.width, int(self.height / 3))
+        self.rect.x = self.x
+        self.rect.y = self.y
 
     def standing(self, screen):
         Chara.standing(self, screen)
@@ -470,10 +458,98 @@ class PNJ(Chara, pygame.sprite.Sprite):
     def set_animation(self, state):
         Chara.set_animation(self, state)
 
-    def set_level(self, level, ownX, ownY):
+    def set_commande(self, state):
+        Chara.set_commande(self, state)
+
+    def dialogue_get(self):
+        return self.dialogue
+
+    def commande_get(self):
+        return self.commande
+
+    def animation_get(self):
+        return self.animation
+
+    def collision(self, furnitures, scrolling, scrollingX, scrollingY):
+        Chara.collision(self, furnitures, scrolling, scrollingX, scrollingY)
+
+
+class PNJ(Chara, pygame.sprite.Sprite):
+
+    def __init__(self, ownx, owny, speed, level,
+                 front,
+                 back,
+                 right,
+                 left,
+                 Wfront,
+                 Wright,
+                 Wleft,
+                 Rfront,
+                 Rback,
+                 Rright,
+                 Rleft,
+                 RWfront,
+                 RWright,
+                 RWleft,
+                 bounce,
+                 dubitatif,
+                 dubitatif_bis):
+        pygame.sprite.Sprite.__init__(self)
+
+        Chara.__init__(self,
+                       front,
+                       back,
+                       right,
+                       left,
+                       Wfront,
+                       Wright,
+                       Wleft,
+                       Rfront,
+                       Rback,
+                       Rright,
+                       Rleft,
+                       RWfront,
+                       RWright,
+                       RWleft,
+                       bounce,
+                       dubitatif,
+                       dubitatif_bis)
+
         self.level = level
-        self.ownX = ownX
-        self.ownY = ownY
+        self.ownx = ownx
+        self.owny = owny
+        self.x = self.level.PosX + self.ownx
+        self.y = self.level.PosY + self.owny
+        self.cameraX, self.cameraY = self.x, self.y
+        self.speed = speed
+        self.uprect = pygame.Rect(self.x, self.y, self.width, 2 * int(self.height / 3))
+        self.downrect = pygame.Rect(self.x, self.y + 2 * int(self.height / 3), self.width, int(self.height / 3))
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+    def standing(self, screen):
+        Chara.standing(self, screen)
+
+    def walking(self, screen):
+        Chara.walking(self, screen)
+
+    def set_right(self):
+        Chara.set_right(self)
+
+    def set_left(self):
+        Chara.set_left(self)
+
+    def set_front(self):
+        Chara.set_front(self)
+
+    def set_front(self):
+        Chara.set_front(self)
+
+    def set_dialogue(self, state):
+        Chara.set_dialogue(self, state)
+
+    def set_animation(self, state):
+        Chara.set_animation(self, state)
 
     def set_commande(self, state):
         Chara.set_commande(self, state)
@@ -487,9 +563,14 @@ class PNJ(Chara, pygame.sprite.Sprite):
     def animation_get(self):
         return self.animation
 
-    def update(self, ):
-        self.x = self.level.PosX + self.ownX
-        self.y = self.level.PosY + self.ownY
+    def update(self):
+        self.x = self.level.PosX + self.ownx
+        self.y = self.level.PosY + self.owny
+        self.cameraX, self.cameraY = self.x, self.y
+
+    def set_level(self, level, ownx, owny):
+        self.level = level
+        self.ownx, self.owny = ownx, owny
 
 
 class Handler:

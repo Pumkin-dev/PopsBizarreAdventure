@@ -12,7 +12,7 @@ myappid = 'mycompany.myproduct.subproduct.version'
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 import pygame
-from ressource import Chara, PNJ, Handler, Option, Scene, Object
+from ressource import *
 from DialogueBox import animation_text, istime
 
 
@@ -63,33 +63,45 @@ def main():
     rightfalo = []
     leftfalo = []
     for i in range(6):
-        frontpops.append(loading("images/chara/pops/sprite_standing/front/normal/front{}.png".format(i + 1)).convert_alpha())
+        frontpops.append(
+            loading("images/chara/pops/sprite_standing/front/normal/front{}.png".format(i + 1)).convert_alpha())
 
         backpops.append(loading("images/chara/pops/sprite_standing/back/back{}.png".format(i + 1)).convert_alpha())
 
-        rightpops.append(loading("images/chara/pops/sprite_standing/right/normal/right{}.png".format(i + 1)).convert_alpha())
+        rightpops.append(
+            loading("images/chara/pops/sprite_standing/right/normal/right{}.png".format(i + 1)).convert_alpha())
 
-        leftpops.append(loading("images/chara/pops/sprite_standing/left/normal/left{}.png".format(i + 1)).convert_alpha())
+        leftpops.append(
+            loading("images/chara/pops/sprite_standing/left/normal/left{}.png".format(i + 1)).convert_alpha())
 
-        Wfrontpops.append(loading("images/chara/pops/sprite_standing/front/wink/front{}.png".format(i + 1)).convert_alpha())
+        Wfrontpops.append(
+            loading("images/chara/pops/sprite_standing/front/wink/front{}.png".format(i + 1)).convert_alpha())
 
-        Wrightpops.append(loading("images/chara/pops/sprite_standing/right/wink/right{}.png".format(i + 1)).convert_alpha())
+        Wrightpops.append(
+            loading("images/chara/pops/sprite_standing/right/wink/right{}.png".format(i + 1)).convert_alpha())
 
-        Wleftpops.append(loading("images/chara/pops/sprite_standing/left/wink/left{}.png".format(i + 1)).convert_alpha())
+        Wleftpops.append(
+            loading("images/chara/pops/sprite_standing/left/wink/left{}.png".format(i + 1)).convert_alpha())
 
-        Rfrontpops.append(loading("images/chara/pops/sprite_walking/front/normal/front{}.png".format(i + 1)).convert_alpha())
+        Rfrontpops.append(
+            loading("images/chara/pops/sprite_walking/front/normal/front{}.png".format(i + 1)).convert_alpha())
 
         Rbackpops.append(loading("images/chara/pops/sprite_walking/back/back{}.png".format(i + 1)).convert_alpha())
 
-        Rrightpops.append(loading("images/chara/pops/sprite_walking/right/normal/right{}.png".format(i + 1)).convert_alpha())
+        Rrightpops.append(
+            loading("images/chara/pops/sprite_walking/right/normal/right{}.png".format(i + 1)).convert_alpha())
 
-        Rleftpops.append(loading("images/chara/pops/sprite_walking/left/normal/left{}.png".format(i + 1)).convert_alpha())
+        Rleftpops.append(
+            loading("images/chara/pops/sprite_walking/left/normal/left{}.png".format(i + 1)).convert_alpha())
 
-        RWfrontpops.append(loading("images/chara/pops/sprite_walking/front/wink/front{}.png".format(i + 1)).convert_alpha())
+        RWfrontpops.append(
+            loading("images/chara/pops/sprite_walking/front/wink/front{}.png".format(i + 1)).convert_alpha())
 
-        RWrightpops.append(loading("images/chara/pops/sprite_walking/right/wink/right{}.png".format(i + 1)).convert_alpha())
+        RWrightpops.append(
+            loading("images/chara/pops/sprite_walking/right/wink/right{}.png".format(i + 1)).convert_alpha())
 
-        RWleftpops.append(loading("images/chara/pops/sprite_walking/left/wink/left{}.png".format(i + 1)).convert_alpha())
+        RWleftpops.append(
+            loading("images/chara/pops/sprite_walking/left/wink/left{}.png".format(i + 1)).convert_alpha())
 
         frontfalo.append(loading("images/chara/falo/sprite_standing/front/front{}.png".format(i + 1)))
 
@@ -116,24 +128,23 @@ def main():
     widthPops, heightPops = backpops[0].get_rect().size
     velPops = 5
 
-    Pops = Chara(initialPosX, initialPosY, widthPops, heightPops, velPops, frontpops,
-                 backpops,
-                 rightpops,
-                 leftpops,
-                 Wfrontpops,
-                 Wrightpops,
-                 Wleftpops,
-                 Rfrontpops,
-                 Rbackpops,
-                 Rrightpops,
-                 Rleftpops,
-                 RWfrontpops,
-                 RWrightpops,
-                 RWleftpops,
-                 bouncepops,
-                 dubitatifpops,
-                 dubitatif_bispops)  # toutes les caractéristiques de Pops
-
+    Pops = Player(initialPosX, initialPosY, velPops, frontpops,
+                  backpops,
+                  rightpops,
+                  leftpops,
+                  Wfrontpops,
+                  Wrightpops,
+                  Wleftpops,
+                  Rfrontpops,
+                  Rbackpops,
+                  Rrightpops,
+                  Rleftpops,
+                  RWfrontpops,
+                  RWrightpops,
+                  RWleftpops,
+                  bouncepops,
+                  dubitatifpops,
+                  dubitatif_bispops)  # toutes les caractéristiques de Pops
 
     # toutes les caractéristiques pour le scrolling
     # on prend la moitié de l'écran pour le début du scrolling 
@@ -155,7 +166,7 @@ def main():
     Table3 = Object(table1, Bar, 256 * 3, 716)
     for elt in (Comptoir1, Comptoir2, Comptoir3, Comptoir4, Table1, Table2, Table3):
         Bar.addFurnitures(elt)
-    Falo = PNJ(253, 366, *frontfalo[0].get_rect().size, Pops.speed, Bar, frontfalo, frontfalo, rightfalo, leftfalo,
+    Falo = PNJ(253, 366, Pops.speed, Bar, frontfalo, frontfalo, rightfalo, leftfalo,
                frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo
                , frontfalo, frontfalo, frontfalo, frontfalo)
     # initialize the pygame module
@@ -205,9 +216,9 @@ def main():
         print(Pops.SInput, compteur)
         if not Pops.SInput and compteur == 0:
             compteur = fadetoblack(5, screen, [],
-                                       [(text1, 370,
-                                         380)], Fading,
-                                       Menu, compteur)
+                                   [(text1, 370,
+                                     380)], Fading,
+                                   Menu, compteur)
             if compteur == 1:
                 time1 = pygame.time.get_ticks()
         elif Pops.SInput and compteur == 0:
@@ -220,8 +231,8 @@ def main():
 
         elif istime(time1, 1) and compteur == 1:
             compteur = fadetoblack(5, screen, [(text1, 370, 380)],
-                                       [(text2, 100, 380)], Fading,
-                                       Menu, compteur)
+                                   [(text2, 100, 380)], Fading,
+                                   Menu, compteur)
 
             if compteur == 2:
                 time1 = pygame.time.get_ticks()
@@ -234,15 +245,15 @@ def main():
             print("étzazaz lp", Pops.SInput)
         elif istime(time1, 1) and compteur == 2:
             compteur = fadetoblack(5, screen, [(text2, 100, 380)],
-                                       [(font.render("Lancer jeu", False, white), 800, 400)], Game,
-                                       Menu, compteur)
+                                   [(font.render("Lancer jeu", False, white), 800, 400)], Game,
+                                   Menu, compteur)
         elif Pops.SInput and compteur == 2:
             fade.set_alpha(255)
             bisfade.set_alpha(0)
             Pops.SInput = False
             compteur += 1
             screen.fill(black)
-        print(Pops.SInput,"c")
+        print(Pops.SInput, "c")
         if compteur == 3:
             Fading.stateEvent = True
 
@@ -251,12 +262,12 @@ def main():
 
         if Fading.stateEvent and not Intro.stateEvent:
             fadetoblack(5, screen, [(font.render("Lancer jeu", False, red), 800, 400)],
-                            [Bar, *Bar.furnitures, Pops], Fading,
-                            Menu, compteur)
+                        [Bar, *Bar.furnitures, Pops], Fading,
+                        Menu, compteur)
             if not Fading.stateEvent:
                 Intro.stateEvent = False
         return position, compteur, time1
-        print(Pops.SInput,'té')
+        print(Pops.SInput, 'té')
 
     def menu(font, position):
         position = position % 1
@@ -442,15 +453,16 @@ def main():
             chara.y -= 1
         for elt in pnj:
             elt.update()
+
     # fonction qui permet d'afficher la carte
     def printlevel(screen, level, characters):
         level.draw(screen)
 
-        for chara in characters:
+        for chara in player:
             chara.collision(level.furnitures, Scrolling, ScrollingX, ScrollingY)
 
         for elt in level.furnitures:
-            for chara in characters:
+            for chara in player:
                 if elt.rect.center[1] <= chara.downrect.top:
                     elt.draw(screen)
 
@@ -465,6 +477,7 @@ def main():
                 if elt.rect.center[1] >= chara.uprect.bottom:
                     elt.draw(screen)
         pygame.draw.rect(screen, red, Pops.uprect)
+
     # boucle principale
     while running:
 
@@ -472,9 +485,10 @@ def main():
         clock.tick_busy_loop(60)  # contrôle le nombre de frame du jeu
         characters = pygame.sprite.Group(Pops, Falo)
         pnj = pygame.sprite.Group(Falo)
+        player = pygame.sprite.Group(Pops)
         # event handling, gets all event from the event queue
         events = pygame.event.get()
-        print(Pops.SInput,'dd')
+        print(Pops.SInput, 'dd')
         for event in events:
             # only do something if the event is of type QUIT
             if event.type == pygame.QUIT:
@@ -504,7 +518,7 @@ def main():
                         position -= 1
                     elif event.key == pygame.K_DOWN:
                         position += 1
-        print(Pops.SInput,'dfsdf')
+        print(Pops.SInput, 'dfsdf')
         if Intro.stateEvent:
             position, compteur, time1 = game_intro(screen, position, compteur, time1)
         else:
