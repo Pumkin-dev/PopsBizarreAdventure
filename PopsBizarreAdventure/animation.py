@@ -44,7 +44,7 @@ loading     = pygame.image.load #pour que ce soit plus rapide pour charger des i
 #et on charge les images nécessaires
 
 
-def animation_text(text,screen,sprite,font,dialogue_box,curseur,maps,stagePosX,stagePosY,cameraPosX,cameraPosY,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops):
+def animation_text(text,screen,sprite,font,dialogue_box,curseur,maps,stagePosX,stagePosY):
     global dialogue_x,dialogue_y,first_x,first_y
     global string,passer,finir
     global n,frame,p
@@ -103,7 +103,6 @@ def animation_text(text,screen,sprite,font,dialogue_box,curseur,maps,stagePosX,s
                 sprite.set_dialogue(False)
                 sprite.set_commande(True)
                 screen.blit(maps,(stagePosX,stagePosY))
-                sprite.walking(screen,cameraPosX,cameraPosY,frontpops,backpops,rightpops,leftpops,Wfrontpops,Wrightpops,Wleftpops)
     
     
     #si processus de passage activé
