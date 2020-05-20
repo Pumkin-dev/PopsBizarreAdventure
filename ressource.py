@@ -524,6 +524,7 @@ class PNJ(Chara, pygame.sprite.Sprite):
         self.speed = speed
         self.uprect = pygame.Rect(self.x, self.y, self.width, 2 * int(self.height / 3))
         self.downrect = pygame.Rect(self.x, self.y + 2 * int(self.height / 3), self.width, int(self.height / 3))
+        self.downrectbis = pygame.Rect(self.x, self.y + int(self.height / 3), self.width, 2 * int(self.height / 3))
         self.rect.x = self.x
         self.rect.y = self.y
 

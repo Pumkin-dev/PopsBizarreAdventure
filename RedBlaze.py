@@ -458,7 +458,7 @@ def main():
     def printlevel(screen, level, characters):
         level.draw(screen)
         decor = pygame.sprite.Group(*pnj, *level.furnitures)
-        pygame.draw.rect(screen, blue, Falo.rect)
+        pygame.draw.rect(screen, blue, Falo.downrectbis)
 
         for chara in player:
             chara.collision(decor, Scrolling, ScrollingX, ScrollingY)
@@ -471,7 +471,7 @@ def main():
                     else:
                         elt.standing(screen)
 
-        for chara in characters:
+        for chara in player:
             if chara.walk:
                 chara.walking(screen)
             else:
