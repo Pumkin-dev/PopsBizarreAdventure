@@ -364,7 +364,7 @@ def main():
                     chara.set_front()
                     chara.VelY = chara.speed
                 # Haut
-                elif key[pygame.K_UP] and chara.y > level.PosY:
+                elif key[pygame.K_UP]:
                     chara.y -= chara.speed
                     chara.set_back()
                     chara.VelY = -chara.speed
@@ -380,7 +380,7 @@ def main():
                     chara.set_front()
 
                 # Haut
-                elif key[pygame.K_UP] and chara.y > level.PosY:
+                elif key[pygame.K_UP]:
                     chara.y -= chara.speed
                     chara.velY = -chara.speed
                     chara.set_back()
@@ -392,7 +392,7 @@ def main():
                 chara.set_front()
                 chara.walk = True
             # Haut
-            elif key[pygame.K_UP] and chara.y > level.PosY:
+            elif key[pygame.K_UP]:
                 chara.y -= chara.speed
                 chara.VelY = -chara.speed
                 chara.set_back()
@@ -457,14 +457,19 @@ def main():
     # fonction qui permet d'afficher la carte
     def printlevel(screen, level, characters):
         level.draw(screen)
+        decor = pygame.sprite.Group(*pnj, *level.furnitures)
+        pygame.draw.rect(screen, blue, Falo.rect)
 
         for chara in player:
-            chara.collision(level.furnitures, Scrolling, ScrollingX, ScrollingY)
+            chara.collision(decor, Scrolling, ScrollingX, ScrollingY)
 
-        for elt in level.furnitures:
+        for elt in decor:
             for chara in player:
                 if elt.rect.center[1] <= chara.downrect.top:
-                    elt.draw(screen)
+                    if isinstance(elt, Object):
+                        elt.draw(screen)
+                    else:
+                        elt.standing(screen)
 
         for chara in characters:
             if chara.walk:
@@ -472,10 +477,14 @@ def main():
             else:
                 chara.standing(screen)
 
-        for elt in level.furnitures:
-            for chara in characters:
+        for elt in decor:
+            for chara in player:
                 if elt.rect.center[1] >= chara.uprect.bottom:
-                    elt.draw(screen)
+                    if isinstance(elt, Object):
+                        elt.draw(screen)
+                    else:
+                        elt.standing(screen)
+
         pygame.draw.rect(screen, red, Pops.uprect)
 
     # boucle principale
