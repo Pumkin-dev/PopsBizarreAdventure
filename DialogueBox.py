@@ -83,7 +83,7 @@ def structuration(text, font, first_x, first_y, limit):
     return newtext
 
 
-def animation_text(text, screen, sprite, dialogue_box, curseur, nb_dialogue, nb_final, emotion):
+def animation_text(text, screen, sprite, dialogue_box, curseur, nb_dialogue, nb_final, emotion, events):
     global dialogue_x, dialogue_y, rememberStrings, font, compteur
     global string
     global n, m, frame, p, factor, spaces, testline, time1
@@ -91,6 +91,17 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, nb_dialogue, nb_
     font = pygame.font.Font("VCR_OSD_MONO_1.001.ttf", 30)
     frameP = 0
     listwords = text.split(" ")
+    Input = False
+
+    if m == 0:
+        events = []
+
+    for event in events:
+        if event.type == pygame.KEYDOWN:
+            if not event.key in (pygame.K_UP, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_DOWN):
+                Input = True
+        else:
+            Input = False
 
     def face(screen, sprite, n, frame, frame_nb, PosX, PosY, emotion):
         if emotion is None:
@@ -161,7 +172,7 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, nb_dialogue, nb_
         # puis on incrémente pour simuler les frames
         n += 1
 
-    if sprite.SInput:
+    if Input:
         # Si l'animation est en cours
         if sprite.animation_get():
             # on active le processus de passage

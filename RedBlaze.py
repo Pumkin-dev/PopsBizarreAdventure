@@ -172,7 +172,7 @@ def main():
     Table3 = Object(table1, Bar, 256 * 3, 716)
     for elt in (Comptoir1, Comptoir2, Comptoir3, Comptoir4, Table1, Table2, Table3):
         Bar.addFurnitures(elt)
-    Falo = PNJ(253, 366, Pops.speed, Bar, frontfalo, frontfalo, rightfalo, leftfalo,
+    Falo = PNJ(230, 366, Pops.speed, Bar, frontfalo, frontfalo, rightfalo, leftfalo,
                frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo
                , frontfalo, bouncefalo, bouncefalo, bouncefalo)
     # initialize the pygame module
@@ -253,7 +253,6 @@ def main():
         elif Pops.SInput and compteur == 2:
             fade.set_alpha(255)
             bisfade.set_alpha(0)
-            Pops.SInput = False
             compteur += 1
             screen.fill(black)
         if compteur == 3:
@@ -280,7 +279,7 @@ def main():
 
         if hitbox_lancerjeu.collidepoint(mousepos[0], mousepos[1]) or position == 0:
             screen.blit(font.render("Lancer jeu", False, red), (800, 400))
-            if click or Pops.SInput:
+            if click:
                 Fading.stateEvent = True
                 Menu.stateEvent = False
                 Intro.stateEvent = False
@@ -508,27 +507,11 @@ def main():
                 if event.key == pygame.K_F4:
                     screen = option.dimension(screen)
                 for sprite in characters:
-                    # Si c'est pendant un dialogue :
-                    if sprite.dialogue_get() or Fading.stateEvent or Intro.stateEvent:
-                        if event.key not in (pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT):
-                            sprite.SInput = True
-                        else:
-                            sprite.SInput = False
-                    else:
-                        Scrolling.stateEvent = True
-                        sprite.set_commande(True)
-
                     if sprite.detection and event.type == pygame.KEYDOWN and event.unicode == "z":
                         sprite.set_dialogue(True)
                         Scrolling.stateEvent = False
                     if event.key == pygame.K_ESCAPE:
                         running = False
-                    if event.key == pygame.K_UP:
-                        position -= 1
-                    elif event.key == pygame.K_DOWN:
-                        position += 1
-            else:
-                Pops.SInput = False
 
         if Intro.stateEvent:
             position, compteur, time1 = game_intro(screen, position, compteur, time1)
@@ -538,7 +521,8 @@ def main():
 
         if Game.stateEvent:
 
-            controles(Bar, Pops)
+            if Pops.commande_get():
+                controles(Bar, Pops)
             # puis on affiche le sprite
             screen.fill(black)
             printlevel(screen, Bar, characters)
@@ -549,19 +533,18 @@ def main():
                 if Pops.informationDetection in (Table1.rect, Table3.rect, Table2.rect):
                     if nb_dialogue == 0:
                         nb_dialogue = animation_text("Une simple banquette rouge avec une table.", screen, Pops,
-                                                     dialogue_box, curseur, nb_dialogue, 4, None)
-                    if nb_dialogue == 1:
+                                                     dialogue_box, curseur, nb_dialogue, 4, None, events)
+                    elif nb_dialogue == 1:
                         nb_dialogue = animation_text("... Hein ? Pourquoi des tasses sont servies s'il y a personne ?"
                                                      + " \n "
                                                      + "En plus elles sont vides ...", screen, Pops, dialogue_box,
-                                                     curseur, nb_dialogue, 4, None)
-                    if nb_dialogue == 2:
+                                                     curseur, nb_dialogue, 4, None, events)
+                    elif nb_dialogue == 2:
                         nb_dialogue = animation_text("Que c'est stupide.", screen, Pops, dialogue_box, curseur,
-                                                     nb_dialogue, 4,
-                                                     None)
-                    if nb_dialogue == 3:
+                                                     nb_dialogue, 4, None, events)
+                    elif nb_dialogue == 3:
                         nb_dialogue = animation_text("...", screen, Pops, dialogue_box, curseur, nb_dialogue, 4,
-                                                     "dubitatif")
+                                                     "dubitatif", events)
                 elif Pops.informationDetection == Falo.rect:
                     if Pops.right:
                         Falo.set_left()
@@ -572,10 +555,12 @@ def main():
 
                     if nb_dialogue == 0:
                         nb_dialogue = animation_text("coucou", screen, Falo, dialogue_box, curseur, nb_dialogue,
-                                                     2, "bounce")
-                    if nb_dialogue == 1:
+                                                     2, "bounce", events)
+                    elif nb_dialogue == 1:
                         nb_dialogue = animation_text("eh beh c'est sympa", screen, Pops, dialogue_box, curseur,
-                                                     nb_dialogue, 2, "bounce")
+                                                     nb_dialogue, 2, "bounce", events)
+                else:
+                    pass
             else:
                 nb_dialogue = 0
         # puis on met à jour l'écran
