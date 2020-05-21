@@ -83,7 +83,7 @@ def structuration(text, font, first_x, first_y, limit):
     return newtext
 
 
-def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialogue, nb_final, emotion):
+def animation_text(text, screen, sprite, dialogue_box, curseur, nb_dialogue, nb_final, emotion):
     global dialogue_x, dialogue_y, rememberStrings, font, compteur
     global string
     global n, m, frame, p, factor, spaces, testline, time1
@@ -91,6 +91,7 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, level, nb_dialog
     font = pygame.font.Font("VCR_OSD_MONO_1.001.ttf", 30)
     frameP = 0
     listwords = text.split(" ")
+
     def face(screen, sprite, n, frame, frame_nb, PosX, PosY, emotion):
         if emotion is None:
             pass

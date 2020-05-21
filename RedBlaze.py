@@ -62,6 +62,7 @@ def main():
     frontfalo = []
     rightfalo = []
     leftfalo = []
+    bouncefalo = []
     for i in range(6):
         frontpops.append(
             loading("images/chara/pops/sprite_standing/front/normal/front{}.png".format(i + 1)).convert_alpha())
@@ -110,11 +111,16 @@ def main():
         rightfalo.append(loading("images/chara/falo/sprite_standing/right/right{}.png".format(i + 1)))
 
     for i in range(4):
-        bouncepops.append(loading("images/dialogue/face_discussion/bounce/bounce{}.png ".format(i + 1)).convert_alpha())
+        bouncepops.append(loading("images/dialogue/face_discussion/Pops/"
+                                  + "bounce/bounce{}.png ".format(i + 1)).convert_alpha())
         dubitatifpops.append(loading("images/dialogue/face_discussion"
-                                     + "/dubitatif/dubitatif{}.png ".format(i + 1)).convert_alpha())
+                                     + "/Pops/dubitatif/dubitatif{}.png ".format(i + 1)).convert_alpha())
+
         dubitatif_bispops.append(loading("images/dialogue/face_discussion"
-                                         + "/dubitatif2/dubitatif_bis{}.png ".format(i + 1)).convert_alpha())
+                                         + "/Pops/dubitatif2/dubitatif_bis{}.png ".format(i + 1)).convert_alpha())
+
+        bouncefalo.append(loading("images/dialogue/face_discussion"
+                                  + "/Falo/bounce/bounce{}.png".format(i + 1)).convert_alpha())
 
     bar = loading("images/level/background/bar.png").convert_alpha()
     dialogue_box = loading("images/dialogue/dialogue_box.png").convert()
@@ -168,7 +174,7 @@ def main():
         Bar.addFurnitures(elt)
     Falo = PNJ(253, 366, Pops.speed, Bar, frontfalo, frontfalo, rightfalo, leftfalo,
                frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo
-               , frontfalo, frontfalo, frontfalo, frontfalo)
+               , frontfalo, bouncefalo, bouncefalo, bouncefalo)
     # initialize the pygame module
     pygame.init()
     # On initialise le son (si jamais)
@@ -213,7 +219,6 @@ def main():
     def game_intro(screen, position, compteur, time1):
         text1 = font.render("Un jeu pas réalisé par Hideo Kojima", False, white)
         text2 = font.render("et par Yoko Taro, Masahiro Sakurai, et encore moins David Cage", False, white)
-        print(Pops.SInput, compteur)
         if not Pops.SInput and compteur == 0:
             compteur = fadetoblack(5, screen, [],
                                    [(text1, 370,
@@ -225,7 +230,6 @@ def main():
             fade.set_alpha(255)
             bisfade.set_alpha(0)
             Pops.SInput = False
-            print("ét lp", Pops.SInput)
             compteur += 1
             screen.fill(black)
 
@@ -242,7 +246,6 @@ def main():
             Pops.SInput = False
             compteur += 1
             screen.fill(black)
-            print("étzazaz lp", Pops.SInput)
         elif istime(time1, 1) and compteur == 2:
             compteur = fadetoblack(5, screen, [(text2, 100, 380)],
                                    [(font.render("Lancer jeu", False, white), 800, 400)], Game,
@@ -253,7 +256,6 @@ def main():
             Pops.SInput = False
             compteur += 1
             screen.fill(black)
-        print(Pops.SInput, "c")
         if compteur == 3:
             Fading.stateEvent = True
 
@@ -267,7 +269,6 @@ def main():
             if not Fading.stateEvent:
                 Intro.stateEvent = False
         return position, compteur, time1
-        print(Pops.SInput, 'té')
 
     def menu(font, position):
         position = position % 1
@@ -497,14 +498,13 @@ def main():
         player = pygame.sprite.Group(Pops)
         # event handling, gets all event from the event queue
         events = pygame.event.get()
-        print(Pops.SInput, 'dd')
         for event in events:
             # only do something if the event is of type QUIT
             if event.type == pygame.QUIT:
                 # change the value to False, to exit the main loop
                 running = False
             # Si une touche est pressée ...
-            elif event.type in (pygame.KEYDOWN, pygame.KEYUP):
+            elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_F4:
                     screen = option.dimension(screen)
                 for sprite in characters:
@@ -527,7 +527,9 @@ def main():
                         position -= 1
                     elif event.key == pygame.K_DOWN:
                         position += 1
-        print(Pops.SInput, 'dfsdf')
+            else:
+                Pops.SInput = False
+
         if Intro.stateEvent:
             position, compteur, time1 = game_intro(screen, position, compteur, time1)
         else:
@@ -544,28 +546,40 @@ def main():
             # si on actives les dialogues
             if Pops.dialogue_get():
                 Scrolling.stateEvent = False
-                if Pops.informationDetection in (Table1, Table3, Table2):
+                if Pops.informationDetection in (Table1.rect, Table3.rect, Table2.rect):
                     if nb_dialogue == 0:
                         nb_dialogue = animation_text("Une simple banquette rouge avec une table.", screen, Pops,
-                                                     dialogue_box, curseur, Bar, nb_dialogue, 4, None)
+                                                     dialogue_box, curseur, nb_dialogue, 4, None)
                     if nb_dialogue == 1:
                         nb_dialogue = animation_text("... Hein ? Pourquoi des tasses sont servies s'il y a personne ?"
                                                      + " \n "
                                                      + "En plus elles sont vides ...", screen, Pops, dialogue_box,
-                                                     curseur, Bar, nb_dialogue, 4, None)
+                                                     curseur, nb_dialogue, 4, None)
                     if nb_dialogue == 2:
-                        nb_dialogue = animation_text("Que c'est stupide.", screen, Pops, dialogue_box, curseur, Bar,
+                        nb_dialogue = animation_text("Que c'est stupide.", screen, Pops, dialogue_box, curseur,
                                                      nb_dialogue, 4,
                                                      None)
                     if nb_dialogue == 3:
-                        nb_dialogue = animation_text("...", screen, Pops, dialogue_box, curseur, Bar, nb_dialogue, 4,
+                        nb_dialogue = animation_text("...", screen, Pops, dialogue_box, curseur, nb_dialogue, 4,
                                                      "dubitatif")
+                elif Pops.informationDetection == Falo.rect:
+                    if Pops.right:
+                        Falo.set_left()
+                    elif Pops.left:
+                        Falo.set_right()
+                    elif Pops.back:
+                        Falo.set_front()
 
+                    if nb_dialogue == 0:
+                        nb_dialogue = animation_text("coucou", screen, Falo, dialogue_box, curseur, nb_dialogue,
+                                                     2, "bounce")
+                    if nb_dialogue == 1:
+                        nb_dialogue = animation_text("eh beh c'est sympa", screen, Pops, dialogue_box, curseur,
+                                                     nb_dialogue, 2, "bounce")
             else:
                 nb_dialogue = 0
         # puis on met à jour l'écran
         pygame.display.update()
-        print(Pops.SInput, events)
     pygame.quit()
 
 
