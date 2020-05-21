@@ -73,7 +73,6 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
         self.animation = False
         self.passer = False
         self.finir = False
-        self.SInput = False
         self.detection = False
         self.informationDetection = None
 

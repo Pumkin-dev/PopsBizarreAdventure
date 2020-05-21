@@ -216,20 +216,28 @@ def main():
     time1 = 0
 
     # définiton d'une fonction pour le menu principal au lancement du jeu
-    def game_intro(screen, position, compteur, time1):
+    def game_intro(position, compteur, time1, events):
         text1 = font.render("Un jeu pas réalisé par Hideo Kojima", False, white)
         text2 = font.render("et par Yoko Taro, Masahiro Sakurai, et encore moins David Cage", False, white)
-        if not Pops.SInput and compteur == 0:
+        Input = False
+
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.unicode == 'z':
+                    Input = True
+                else:
+                    Input = False
+
+        if not Input and compteur == 0:
             compteur = fadetoblack(5, screen, [],
                                    [(text1, 370,
                                      380)], Fading,
                                    Menu, compteur)
             if compteur == 1:
                 time1 = pygame.time.get_ticks()
-        elif Pops.SInput and compteur == 0:
+        elif Input and compteur == 0:
             fade.set_alpha(255)
             bisfade.set_alpha(0)
-            Pops.SInput = False
             compteur += 1
             screen.fill(black)
 
@@ -240,17 +248,16 @@ def main():
 
             if compteur == 2:
                 time1 = pygame.time.get_ticks()
-        elif Pops.SInput and compteur == 1:
+        elif Input and compteur == 1:
             fade.set_alpha(255)
             bisfade.set_alpha(0)
-            Pops.SInput = False
             compteur += 1
             screen.fill(black)
         elif istime(time1, 1) and compteur == 2:
             compteur = fadetoblack(5, screen, [(text2, 100, 380)],
                                    [(font.render("Lancer jeu", False, white), 800, 400)], Game,
                                    Menu, compteur)
-        elif Pops.SInput and compteur == 2:
+        elif Input and compteur == 2:
             fade.set_alpha(255)
             bisfade.set_alpha(0)
             compteur += 1
@@ -263,8 +270,7 @@ def main():
 
         if Fading.stateEvent and not Intro.stateEvent:
             fadetoblack(5, screen, [(font.render("Lancer jeu", False, red), 800, 400)],
-                        [Bar, *Bar.furnitures, Pops], Fading,
-                        Menu, compteur)
+                        [Bar, *Bar.furnitures, Pops], Fading, Menu, compteur)
             if not Fading.stateEvent:
                 Intro.stateEvent = False
         return position, compteur, time1
@@ -455,7 +461,7 @@ def main():
             elt.update()
 
     # fonction qui permet d'afficher la carte
-    def printlevel(screen, level, characters):
+    def printlevel(level):
         level.draw(screen)
         decor = pygame.sprite.Group(*pnj, *level.furnitures)
         pygame.draw.rect(screen, blue, Falo.downrectbis)
@@ -514,7 +520,7 @@ def main():
                         running = False
 
         if Intro.stateEvent:
-            position, compteur, time1 = game_intro(screen, position, compteur, time1)
+            position, compteur, time1 = game_intro(position, compteur, time1, events)
         else:
             Game.stateEvent = True
             Fading.stateEvent = False
@@ -525,7 +531,7 @@ def main():
                 controles(Bar, Pops)
             # puis on affiche le sprite
             screen.fill(black)
-            printlevel(screen, Bar, characters)
+            printlevel(Bar)
 
             # si on actives les dialogues
             if Pops.dialogue_get():
@@ -559,8 +565,16 @@ def main():
                     elif nb_dialogue == 1:
                         nb_dialogue = animation_text("eh beh c'est sympa", screen, Pops, dialogue_box, curseur,
                                                      nb_dialogue, 2, "bounce", events)
-                else:
-                    pass
+                elif Pops.informationDetection == Comptoir1.rect:
+                    if nb_dialogue == 0:
+                        nb_dialogue = animation_text("Le portrait d'une tête de télé pédante.", screen, Pops,
+                                                     dialogue_box, curseur, nb_dialogue, 3, None, events)
+                    elif nb_dialogue == 1:
+                        nb_dialogue = animation_text("Tu l'as déjà vu quelque part ...", screen, Pops, dialogue_box,
+                                                     curseur, nb_dialogue, 3, None, events)
+                    elif nb_dialogue == 2:
+                        nb_dialogue = animation_text("En tout cas, sa tête ne te revient pas.", screen, Pops,
+                                                     dialogue_box, curseur, nb_dialogue, 3, None, events)
             else:
                 nb_dialogue = 0
         # puis on met à jour l'écran
