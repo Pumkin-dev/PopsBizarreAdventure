@@ -221,6 +221,8 @@ def animation_text(text, screen, sprite, dialogue_box, curseur, nb_dialogue, nb_
         for i in listwords[spaces]:
             if i == ".":
                 e += 1
+        if listwords[spaces] == '\n':
+            time1 == pygame.time.get_ticks()
 
         if font.size(testline)[0] >= limit or listwords[spaces] == '\n':
             dialogue_y += font.size(text)[1] + 2

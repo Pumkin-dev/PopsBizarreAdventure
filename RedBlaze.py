@@ -33,6 +33,7 @@ def main():
     red = pygame.Color(255, 0, 0)  # de même
     blue = pygame.Color(0, 0, 255)
     green = pygame.Color(0, 255, 0)
+    yellow = pygame.Color(255, 255, 0)
 
     loading = pygame.image.load  # pour que ce soit plus rapide pour charger des images
     icon = loading("images/logo.png")
@@ -163,14 +164,18 @@ def main():
     comptoir2 = loading("images/level/objects/comptoir2.png").convert_alpha()
     comptoir3 = loading("images/level/objects/comptoir3.png").convert_alpha()
     comptoir4 = loading("images/level/objects/comptoir4.png").convert_alpha()
+    buffet = loading("images/level/objects/buffet.png").convert_alpha()
+    tabouret = loading("images/level/objects/tabouret.png").convert_alpha()
+    Buffet = Object(buffet, Bar, 396, 54)
+    Tabouret = Object(tabouret, Bar, 366, 536)
     Comptoir1 = Object(comptoir1, Bar, 310, 410)
     Comptoir2 = Object(comptoir2, Bar, 310 + Comptoir1.rect.w, 410)
     Comptoir3 = Object(comptoir3, Bar, 310 + Comptoir1.rect.w + Comptoir2.rect.w, 410)
     Comptoir4 = Object(comptoir4, Bar, 310 + Comptoir1.rect.w + Comptoir2.rect.w + Comptoir3.rect.w, 350)
-    Table1 = Object(table1, Bar, 256, 716)
-    Table2 = Object(table1, Bar, 256 * 2, 716)
-    Table3 = Object(table1, Bar, 256 * 3, 716)
-    for elt in (Comptoir1, Comptoir2, Comptoir3, Comptoir4, Table1, Table2, Table3):
+    Table1 = Object(table1, Bar, 256, 790)
+    Table2 = Object(table1, Bar, 256 + table1.get_rect().size[0], 790)
+    Table3 = Object(table1, Bar, 256 + table1.get_rect().size[0] * 2, 790)
+    for elt in (Buffet, Comptoir1, Comptoir2, Comptoir3, Comptoir4, Tabouret, Table1, Table2, Table3):
         Bar.addFurnitures(elt)
     Falo = PNJ(230, 366, Pops.speed, Bar, frontfalo, frontfalo, rightfalo, leftfalo,
                frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo
@@ -187,7 +192,7 @@ def main():
     pygame.font.init()
 
     # La police d'écriture du jeu
-    font = pygame.font.Font("VCR_OSD_MONO_1.001.ttf", 30)
+    font = pygame.font.Font("VCR_OSD_MONO_1.001.ttf", 34)
 
     # define a variable to control the main loop
     running = True
@@ -207,9 +212,7 @@ def main():
     Intro = Handler()
     Intro.stateEvent = True
 
-    save = {}
-    save["paramètres"] = option
-    save["joueur"] = Pops
+    save = {"paramètres": option, "joueur": Pops}
     nb_dialogue = 0
     position = 0
     compteur = 0
@@ -227,6 +230,10 @@ def main():
                     Input = True
                 else:
                     Input = False
+                if event.key == pygame.K_LEFT:
+                    position -= 1
+                elif event.key == pygame.K_RIGHT:
+                    position += 1
 
         if not Input and compteur == 0:
             compteur = fadetoblack(5, screen, [],
@@ -242,8 +249,7 @@ def main():
             screen.fill(black)
 
         elif istime(time1, 1) and compteur == 1:
-            compteur = fadetoblack(5, screen, [(text1, 370, 380)],
-                                   [(text2, 100, 380)], Fading,
+            compteur = fadetoblack(5, screen, [(text1, 370, 380)], [(text2, 10, 380)], Fading,
                                    Menu, compteur)
 
             if compteur == 2:
@@ -254,8 +260,9 @@ def main():
             compteur += 1
             screen.fill(black)
         elif istime(time1, 1) and compteur == 2:
-            compteur = fadetoblack(5, screen, [(text2, 100, 380)],
-                                   [(font.render("Lancer jeu", False, white), 800, 400)], Game,
+            compteur = fadetoblack(5, screen, [(text2, 10, 380)],
+                                   [(font.render("Lancer jeu", False, white), 800, 400),
+                                    (font.render("Commencer", False, white), 400, 400)], Game,
                                    Menu, compteur)
         elif Input and compteur == 2:
             fade.set_alpha(255)
@@ -265,33 +272,41 @@ def main():
         if compteur == 3:
             Fading.stateEvent = True
 
-        if compteur == 3 and Intro.stateEvent:
-            menu(font, position)
+        if compteur == 3 and Menu.stateEvent and Intro.stateEvent:
+            menu(font, position, Input)
 
-        if Fading.stateEvent and not Intro.stateEvent:
-            fadetoblack(5, screen, [(font.render("Lancer jeu", False, red), 800, 400)],
-                        [Bar, *Bar.furnitures, Pops], Fading, Menu, compteur)
+        if Fading.stateEvent and not Menu.stateEvent:
+            fadetoblack(5, screen, [(font.render("Lancer jeu", False, yellow), 800, 400),
+                                    (font.render("Commencer", False, white), 400, 400)],
+                        [Bar, *decor, Pops], Fading, Menu, compteur)
             if not Fading.stateEvent:
                 Intro.stateEvent = False
         return position, compteur, time1
 
-    def menu(font, position):
-        position = position % 1
+    def menu(font, position, touch):
+        position %= 1
         screen.fill(black)
         # remplir le fond de la couleur
         hitbox_lancerjeu = pygame.Rect(800, 400, 200, 50)
+        hitbox_commencer = pygame.Rect(400, 400, 200, 50)
         mousepos = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()[0]
-
-        if hitbox_lancerjeu.collidepoint(mousepos[0], mousepos[1]) or position == 0:
-            screen.blit(font.render("Lancer jeu", False, red), (800, 400))
+        if hitbox_lancerjeu.collidepoint(mousepos[0], mousepos[1]):
+            screen.blit(font.render("Lancer jeu", False, yellow), (800, 400))
+            screen.blit(font.render("Commencer", False, white), (400, 400))
             if click:
                 Fading.stateEvent = True
                 Menu.stateEvent = False
-                Intro.stateEvent = False
+        elif hitbox_commencer.collidepoint(mousepos[0], mousepos[1]):
+            screen.blit(font.render("Lancer jeu", False, white), (800, 400))
+            screen.blit(font.render("Commencer", False, yellow), (400, 400))
+            if click:
+                Fading.stateEvent = True
+                Menu.stateEvent = False
 
         else:
             screen.blit(font.render("Lancer jeu", False, white), (800, 400))
+            screen.blit(font.render("Commencer", False, white), (400, 400))
         pygame.display.update()
         # def d'une fonction qui permet de faire un fondu en noir
 
@@ -464,7 +479,9 @@ def main():
     def printlevel(level):
         level.draw(screen)
         decor = pygame.sprite.Group(*pnj, *level.furnitures)
-        pygame.draw.rect(screen, blue, Falo.downrectbis)
+        pygame.draw.rect(screen, red, Comptoir1.rect)
+        pygame.draw.rect(screen, blue, Pops.downrect)
+        pygame.draw.rect(screen, white, Tabouret.rect)
 
         for chara in player:
             chara.collision(decor, Scrolling, ScrollingX, ScrollingY)
@@ -491,8 +508,6 @@ def main():
                     else:
                         elt.standing(screen)
 
-        pygame.draw.rect(screen, red, Pops.uprect)
-
     # boucle principale
     while running:
 
@@ -501,6 +516,7 @@ def main():
         characters = pygame.sprite.Group(Pops, Falo)
         pnj = pygame.sprite.Group(Falo)
         player = pygame.sprite.Group(Pops)
+        decor = pygame.sprite.Group(*pnj, *Bar.furnitures)
         # event handling, gets all event from the event queue
         events = pygame.event.get()
         for event in events:

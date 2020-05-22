@@ -316,13 +316,6 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
                             self.x = elt.rect.right
                         else:
                             scrollingX.stateEvent = True
-                        print(scrollingX.stateEvent)
-                    if self.right and rect.right + self.speed >= elt.rect.left >= rect.right:
-                        self.detection = True
-                        collision = True
-                    elif self.left and rect.left - self.speed <= elt.rect.right <= self.x:
-                        self.detection = True
-                        collision = True
                 else:
                     scrollingX.stateEvent = True
 
@@ -372,14 +365,22 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
                                 self.y = elt.rect.bottom
                         else:
                             scrollingY.stateEvent = True
-                    if self.front and rect.bottom + self.speed >= elt.rect.top >= rect.bottom:
-                        self.detection = True
-                        collision = True
-                    elif self.back and rect.top + self.speed <= elt.rect.bottom < rect.bottom:
-                        self.detection = True
-                        collision = True
                 else:
                     scrollingY.stateEvent = True
+                print(self.back, rect.top + self.speed, elt.rect.bottom)
+                if self.front and rect.bottom + self.speed >= elt.rect.top >= rect.bottom:
+                    self.detection = True
+                    collision = True
+                elif self.back and rect.top - self.speed <= elt.rect.bottom < rect.top:
+                    self.detection = True
+                    collision = True
+                    print('miaou')
+                if self.right and rect.right + self.speed >= elt.rect.left >= rect.right:
+                    self.detection = True
+                    collision = True
+                elif self.left and rect.left - self.speed <= elt.rect.right <= self.x:
+                    self.detection = True
+                    collision = True
 
 
 class Player(Chara, pygame.sprite.Sprite):
