@@ -282,13 +282,15 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
                     if self.VelX != 0 and rect.right <= elt.rect.left or self.VelX != 0 \
                             and rect.left >= elt.rect.right:
                         # s'il est à gauche de l'objet
-                        if self.VelX > 0 and rect.right + self.VelX >= elt.rect.left >= rect.right:
+                        if self.VelX > 0 and rect.right + self.VelX >= elt.rect.left >= rect.right \
+                                and rect.left <= elt.rect.left:
                             self.walk = False
                             scrolling.stateEvent = False
                             self.x = elt.rect.left - rect.w
                             collision = True
                         # s'il est à droite
-                        elif self.VelX < 0 and rect.left + self.VelX <= elt.rect.right <= rect.left:
+                        elif self.VelX < 0 and rect.left + self.VelX <= elt.rect.right <= rect.left \
+                                and rect.right >= elt.rect.right:
                             self.walk = False
                             scrolling.stateEvent = False
                             self.x = elt.rect.right
@@ -325,13 +327,14 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
                     if self.VelY != 0 and rect.bottom <= elt.rect.top or self.VelY != 0 \
                             and rect.top >= elt.rect.bottom:
                         # si on bouge en haut de l'objet
-                        if self.VelY > 0 and rect.bottom + self.VelY >= elt.rect.top > self.y:
+                        if self.VelY > 0 and rect.bottom + self.VelY >= elt.rect.top > self.y and rect.top <= elt.rect.top:
                             self.walk = False
                             scrolling.stateEvent = False
                             self.y = elt.rect.top - rect.h
                             collision = True
                         # sinon si on bouge en dessous de l'objet
-                        elif self.VelY < 0 and rect.top + self.VelY <= elt.rect.bottom < rect.bottom:
+                        elif self.VelY < 0 and rect.top + self.VelY <= elt.rect.bottom < rect.bottom \
+                                and rect.bottom >= elt.rect.bottom:
                             self.walk = False
                             scrolling.stateEvent = False
                             if elt.rect.center[1] <= rect.top:
@@ -367,14 +370,12 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
                             scrollingY.stateEvent = True
                 else:
                     scrollingY.stateEvent = True
-                print(self.back, rect.top + self.speed, elt.rect.bottom)
                 if self.front and rect.bottom + self.speed >= elt.rect.top >= rect.bottom:
                     self.detection = True
                     collision = True
                 elif self.back and rect.top - self.speed <= elt.rect.bottom < rect.top:
                     self.detection = True
                     collision = True
-                    print('miaou')
                 if self.right and rect.right + self.speed >= elt.rect.left >= rect.right:
                     self.detection = True
                     collision = True

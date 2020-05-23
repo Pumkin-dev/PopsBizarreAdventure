@@ -166,19 +166,23 @@ def main():
     comptoir4 = loading("images/level/objects/comptoir4.png").convert_alpha()
     buffet = loading("images/level/objects/buffet.png").convert_alpha()
     tabouret = loading("images/level/objects/tabouret.png").convert_alpha()
+    horloge = loading("images/level/objects/horloge.png").convert_alpha()
+    tele = loading("images/level/objects/tele.png")
+    Horloge = Object(horloge, Bar, 122, 116)
+    Tele = Object(tele, Bar, 1129, 100)
     Buffet = Object(buffet, Bar, 396, 54)
-    Tabouret = Object(tabouret, Bar, 366, 536)
+    Tabouret = Object(tabouret, Bar, 1044, 536)
     Comptoir1 = Object(comptoir1, Bar, 310, 410)
     Comptoir2 = Object(comptoir2, Bar, 310 + Comptoir1.rect.w, 410)
     Comptoir3 = Object(comptoir3, Bar, 310 + Comptoir1.rect.w + Comptoir2.rect.w, 410)
-    Comptoir4 = Object(comptoir4, Bar, 310 + Comptoir1.rect.w + Comptoir2.rect.w + Comptoir3.rect.w, 350)
+    Comptoir4 = Object(comptoir4, Bar, 310 + Comptoir1.rect.w + Comptoir2.rect.w + Comptoir3.rect.w, 343)
     Table1 = Object(table1, Bar, 256, 790)
     Table2 = Object(table1, Bar, 256 + table1.get_rect().size[0], 790)
     Table3 = Object(table1, Bar, 256 + table1.get_rect().size[0] * 2, 790)
-    for elt in (Buffet, Comptoir1, Comptoir2, Comptoir3, Comptoir4, Tabouret, Table1, Table2, Table3):
+    for elt in (Horloge, Tele, Buffet, Comptoir1, Comptoir2, Comptoir3, Comptoir4, Tabouret, Table1, Table2, Table3):
         Bar.addFurnitures(elt)
     Falo = PNJ(230, 366, Pops.speed, Bar, frontfalo, frontfalo, rightfalo, leftfalo,
-               frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo
+               frontfalo, rightfalo, leftfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo
                , frontfalo, bouncefalo, bouncefalo, bouncefalo)
     # initialize the pygame module
     pygame.init()
@@ -193,6 +197,7 @@ def main():
 
     # La police d'écriture du jeu
     font = pygame.font.Font("VCR_OSD_MONO_1.001.ttf", 34)
+    otherfont = pygame.font.Font("VCR_OSD_MONO_1.001.ttf", 150)
 
     # define a variable to control the main loop
     running = True
@@ -273,7 +278,7 @@ def main():
             Fading.stateEvent = True
 
         if compteur == 3 and Menu.stateEvent and Intro.stateEvent:
-            menu(font, position, Input)
+            menu(font, otherfont, position, Input)
 
         if Fading.stateEvent and not Menu.stateEvent:
             fadetoblack(5, screen, [(font.render("Lancer jeu", False, yellow), 800, 400),
@@ -283,21 +288,24 @@ def main():
                 Intro.stateEvent = False
         return position, compteur, time1
 
-    def menu(font, position, touch):
+    def menu(font, otherfont, position, touch):
         position %= 1
         screen.fill(black)
+        maintitle = otherfont.render("RedBlaze", True, white)
         # remplir le fond de la couleur
         hitbox_lancerjeu = pygame.Rect(800, 400, 200, 50)
         hitbox_commencer = pygame.Rect(400, 400, 200, 50)
         mousepos = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()[0]
         if hitbox_lancerjeu.collidepoint(mousepos[0], mousepos[1]):
+            screen.blit(maintitle, (10, 10))
             screen.blit(font.render("Lancer jeu", False, yellow), (800, 400))
             screen.blit(font.render("Commencer", False, white), (400, 400))
             if click:
                 Fading.stateEvent = True
                 Menu.stateEvent = False
         elif hitbox_commencer.collidepoint(mousepos[0], mousepos[1]):
+            screen.blit(maintitle, (10, 10))
             screen.blit(font.render("Lancer jeu", False, white), (800, 400))
             screen.blit(font.render("Commencer", False, yellow), (400, 400))
             if click:
@@ -305,6 +313,7 @@ def main():
                 Menu.stateEvent = False
 
         else:
+            screen.blit(maintitle, (10, 10))
             screen.blit(font.render("Lancer jeu", False, white), (800, 400))
             screen.blit(font.render("Commencer", False, white), (400, 400))
         pygame.display.update()
@@ -576,7 +585,7 @@ def main():
                         Falo.set_front()
 
                     if nb_dialogue == 0:
-                        nb_dialogue = animation_text("coucou", screen, Falo, dialogue_box, curseur, nb_dialogue,
+                        nb_dialogue = animation_text("t un panda", screen, Falo, dialogue_box, curseur, nb_dialogue,
                                                      2, "bounce", events)
                     elif nb_dialogue == 1:
                         nb_dialogue = animation_text("eh beh c'est sympa", screen, Pops, dialogue_box, curseur,
