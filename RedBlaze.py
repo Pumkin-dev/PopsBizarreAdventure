@@ -168,6 +168,12 @@ def main():
     tabouret = loading("images/level/objects/tabouret.png").convert_alpha()
     horloge = loading("images/level/objects/horloge.png").convert_alpha()
     tele = loading("images/level/objects/tele.png")
+    mur1 = loading("images/level/objects/mur1.png")
+    mur2 = loading("images/level/objects/mur2.png")
+    Mur1 = Object(mur1, Bar, -168, 0)
+    Mur2 = Object(mur1, Bar, Bar.width - 32, 0)
+    Mur3 = Object(mur2, Bar, 30, 30)
+    Mur4 = Object(mur2, Bar, 30, Bar.height-50)
     Horloge = Object(horloge, Bar, 122, 116)
     Tele = Object(tele, Bar, 1129, 100)
     Buffet = Object(buffet, Bar, 396, 54)
@@ -179,7 +185,8 @@ def main():
     Table1 = Object(table1, Bar, 256, 790)
     Table2 = Object(table1, Bar, 256 + table1.get_rect().size[0], 790)
     Table3 = Object(table1, Bar, 256 + table1.get_rect().size[0] * 2, 790)
-    for elt in (Horloge, Tele, Buffet, Comptoir1, Comptoir2, Comptoir3, Comptoir4, Tabouret, Table1, Table2, Table3):
+    for elt in (Mur1, Mur2, Mur3, Mur4, Horloge, Tele, Buffet, Comptoir1, Comptoir2, Comptoir3, Comptoir4, Tabouret,
+                Table1, Table2, Table3):
         Bar.addFurnitures(elt)
     Falo = PNJ(230, 366, Pops.speed, Bar, frontfalo, frontfalo, rightfalo, leftfalo,
                frontfalo, rightfalo, leftfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo
@@ -367,7 +374,7 @@ def main():
 
     # définition de la fonction du jeu principal
     def controles(level, chara):
-        global velX, velY, PNJ
+        global velX, velY
         pygame.event.set_allowed(pygame.KEYDOWN)
         # On associe keys pour gérer les touches plus efficacement
         key = pygame.key.get_pressed()
@@ -382,13 +389,13 @@ def main():
                 chara.VelX = chara.speed
                 chara.VelY = chara.speed
             # Gauche
-            if key[pygame.K_LEFT] and chara.x - chara.width / 2 > level.PosX:
+            if key[pygame.K_LEFT]:
                 chara.x -= chara.speed
                 chara.VelX = -chara.speed
                 chara.set_left()  # permet de figer le perso dans la dernière pose qu'il faisait
                 # Si jamais d'autres touches sont pressées
                 # Bas
-                if key[pygame.K_DOWN] and chara.y + chara.height < level.PosY + level.height:
+                if key[pygame.K_DOWN]:
                     chara.y += chara.speed
                     chara.VelY = chara.speed
                     chara.set_front()
@@ -400,11 +407,11 @@ def main():
                     chara.VelY = -chara.speed
                 chara.walk = True
             # Droite
-            elif key[pygame.K_RIGHT] and chara.x < level.initialPosX + level.width - (chara.width + chara.width / 2):
+            elif key[pygame.K_RIGHT]:
                 chara.x += chara.speed
                 chara.VelX = chara.speed
                 chara.set_right()  # Aussi
-                if key[pygame.K_DOWN] and chara.y + chara.height < level.PosY + level.height:
+                if key[pygame.K_DOWN]:
                     chara.y += chara.speed
                     chara.velY = chara.speed
                     chara.set_front()
@@ -416,7 +423,7 @@ def main():
                     chara.set_back()
                 chara.walk = True
             # Bas
-            elif key[pygame.K_DOWN] and chara.y + chara.height < level.PosY + level.height:
+            elif key[pygame.K_DOWN]:
                 chara.y += chara.speed
                 chara.VelY = chara.speed
                 chara.set_front()
@@ -488,9 +495,6 @@ def main():
     def printlevel(level):
         level.draw(screen)
         decor = pygame.sprite.Group(*pnj, *level.furnitures)
-        pygame.draw.rect(screen, red, Comptoir1.rect)
-        pygame.draw.rect(screen, blue, Pops.downrect)
-        pygame.draw.rect(screen, white, Tabouret.rect)
 
         for chara in player:
             chara.collision(decor, Scrolling, ScrollingX, ScrollingY)

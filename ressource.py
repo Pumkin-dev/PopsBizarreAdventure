@@ -302,7 +302,7 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
                     # si on bouge verticalement sur les bords verticaux
                     if self.VelY != 0 and rect.left < elt.rect.left:
                         # si on bouge à gauche de l'objet
-                        if self.VelX >= 0 and rect.right + self.speed >= elt.rect.left >= self.x:
+                        if self.VelX >= 0 and rect.right + self.speed >= elt.rect.left >= self.rect.left:
                             self.walk = True
                             scrolling.stateEvent = True
                             scrollingX.stateEvent = False
@@ -311,7 +311,8 @@ class Chara(pygame.sprite.Sprite):  # Classe pour définir les attributs d'un sp
                             scrollingX.stateEvent = True
                     if self.VelY != 0 and rect.left >= elt.rect.right:
                         # si on bouge à droite
-                        if self.VelX <= 0 and rect.left - abs(self.VelX) <= elt.rect.right <= self.x:
+                        if self.VelX <= 0 and rect.left - self.speed <= elt.rect.right <= self.rect.left:
+                            print('miaou')
                             self.walk = True
                             scrolling.stateEvent = True
                             scrollingX.stateEvent = False
@@ -587,9 +588,10 @@ class Handler:
         self.stateEvent = state
 
 
-class Scene:
+class Scene(pygame.sprite.Sprite):
 
     def __init__(self, picture, PosX, PosY):
+        pygame.sprite.Sprite.__init__(self)
         self.picture = picture
         self.PosX = PosX
         self.PosY = PosY
@@ -602,9 +604,8 @@ class Scene:
         self.VelY = 0
         self.lengthX = self.width + 2 * abs(self.initialPosX)
         self.lenghtY = self.height + 2 * abs(self.initialPosY)
-
-    def __iter__(self):
-        return self
+        self.rectleft = pygame.Rect((self.PosX - self.initialPosX, self.PosY), (self.initialPosX + 32, self.height))
+        self.rectright = pygame.Rect((self.initialPosX + self.width, self.initialPosY), self.rectleft.size)
 
     def draw(self, screen):
         screen.blit(self.picture, (self.PosX, self.PosY))
