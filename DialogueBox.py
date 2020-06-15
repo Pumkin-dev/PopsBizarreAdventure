@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# -*- coding: utf-8 -*-
 
 # Module pour toutes les animations en tout genre
 import pygame
@@ -67,6 +66,7 @@ def structuration(text, font, first_x, first_y, limit):
     newtext = []
     for i, elt in enumerate(listword):
         string += elt + " "
+        # si le texte atteint la limite ou est un saut de ligne
         if font.size(string)[0] >= limit or elt == '\n':
             string = string.replace(elt, "")
             newtext.append((font.render(string, False, white), (dialogue_x, dialogue_y)))
@@ -76,7 +76,7 @@ def structuration(text, font, first_x, first_y, limit):
                 string = elt + " "
             dialogue_x = first_x
             dialogue_y += font.size(text)[1] + 2
-
+        # si on a traité tous les mots on affiche le texte structuré
         if i == len(listword) - 1:
             newtext.append((font.render(string, False, white), (dialogue_x, dialogue_y)))
 

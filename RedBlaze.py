@@ -11,7 +11,6 @@ import ctypes
 myappid = 'mycompany.myproduct.subproduct.version'
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
-import pygame
 from ressource import *
 from DialogueBox import animation_text, istime
 
@@ -42,7 +41,7 @@ def main():
     pygame.display.set_icon(icon)
     screen = pygame.display.set_mode((width, height),
                                      pygame.RESIZABLE)  # pour ouvrir une fenêtre aux dimensions height width
-
+    # compilation des images dans les listes
     frontpops = []
     backpops = []
     rightpops = []
@@ -123,18 +122,19 @@ def main():
         bouncefalo.append(loading("images/dialogue/face_discussion"
                                   + "/Falo/bounce/bounce{}.png".format(i + 1)).convert_alpha())
 
+    # d'autres images
     bar = loading("images/level/background/bar.png").convert_alpha()
     dialogue_box = loading("images/dialogue/dialogue_box.png").convert()
 
     curseur = [loading("images/dialogue/curseur/Sprite-0001.png").convert_alpha(),
                loading("images/dialogue/curseur/Sprite-0002.png").convert_alpha()]
 
+    # attributs de Pops
     initialPosX = 600
     initialPosY = 400
-
-    widthPops, heightPops = backpops[0].get_rect().size
     velPops = 5
 
+    # création de Pops
     Pops = Player(initialPosX, initialPosY, velPops, frontpops,
                   backpops,
                   rightpops,
@@ -158,7 +158,10 @@ def main():
     startScrollingX = option.mw
     startScrollingY = option.mh
 
+    # création du niveau Bar
     Bar = Scene(bar, 500, -300)
+
+    # chargement des images pour le bar
     table1 = loading("images/level/objects/table1.png").convert_alpha()
     comptoir1 = loading("images/level/objects/comptoir1.png").convert_alpha()
     comptoir2 = loading("images/level/objects/comptoir2.png").convert_alpha()
@@ -170,10 +173,14 @@ def main():
     tele = loading("images/level/objects/tele.png")
     mur1 = loading("images/level/objects/mur1.png")
     mur2 = loading("images/level/objects/mur2.png")
+    cadre = loading("images/cadre.png")
+    move = loading("images/move.png")
+
+    # création des objets du Bar
     Mur1 = Object(mur1, Bar, -168, 0)
     Mur2 = Object(mur1, Bar, Bar.width - 32, 0)
     Mur3 = Object(mur2, Bar, 30, 30)
-    Mur4 = Object(mur2, Bar, 30, Bar.height-50)
+    Mur4 = Object(mur2, Bar, 30, Bar.height - 50)
     Horloge = Object(horloge, Bar, 122, 116)
     Tele = Object(tele, Bar, 1129, 100)
     Buffet = Object(buffet, Bar, 396, 54)
@@ -185,20 +192,22 @@ def main():
     Table1 = Object(table1, Bar, 256, 790)
     Table2 = Object(table1, Bar, 256 + table1.get_rect().size[0], 790)
     Table3 = Object(table1, Bar, 256 + table1.get_rect().size[0] * 2, 790)
+
+    # compilation des objets du bar dans le bar
     for elt in (Mur1, Mur2, Mur3, Mur4, Horloge, Tele, Buffet, Comptoir1, Comptoir2, Comptoir3, Comptoir4, Tabouret,
                 Table1, Table2, Table3):
         Bar.addFurnitures(elt)
+
+    # Création du PNJ de M. Falo
     Falo = PNJ(230, 366, Pops.speed, Bar, frontfalo, frontfalo, rightfalo, leftfalo,
                frontfalo, rightfalo, leftfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo, frontfalo
                , frontfalo, bouncefalo, bouncefalo, bouncefalo)
-    # initialize the pygame module
+
+    # on initialise le module
     pygame.init()
+
     # On initialise le son (si jamais)
     pygame.mixer.init()
-
-    startScrollingX = option.mw
-    startScrollingY = option.mh
-
     # active le module de texte
     pygame.font.init()
 
@@ -212,6 +221,7 @@ def main():
     # Objet qui permet de contrôler le nombre de frame et le temps
     clock = pygame.time.Clock()
 
+    # On créait les géreurs d'événements
     Menu = Handler()
     Fading = Handler()
     Game = Handler()
@@ -224,7 +234,7 @@ def main():
     Intro = Handler()
     Intro.stateEvent = True
 
-    save = {"paramètres": option, "joueur": Pops}
+    # création de variables utiles pour menu
     nb_dialogue = 0
     position = 0
     compteur = 0
@@ -232,21 +242,27 @@ def main():
 
     # définiton d'une fonction pour le menu principal au lancement du jeu
     def game_intro(position, compteur, time1, events):
+        # textes à afficher dans l'intro du jeu
         text1 = font.render("Un jeu pas réalisé par Hideo Kojima", False, white)
         text2 = font.render("et par Yoko Taro, Masahiro Sakurai, et encore moins David Cage", False, white)
         Input = False
+        fontletter = pygame.font.Font("VCR_OSD_MONO_1.001.ttf", 80)
 
+        # on récupère les événements du jeu
         for event in events:
+            # Si c'est z on active l'input c.a.d que le jeu a reçu une demande du clavier
             if event.type == pygame.KEYDOWN:
                 if event.unicode == 'z':
                     Input = True
                 else:
                     Input = False
+                # on déplace le curseur soit à gauche ou à droite grâce aux flèches directionnelles
                 if event.key == pygame.K_LEFT:
                     position -= 1
                 elif event.key == pygame.K_RIGHT:
                     position += 1
 
+        # si aucune touche appuyé on lance le fading
         if not Input and compteur == 0:
             compteur = fadetoblack(5, screen, [],
                                    [(text1, 370,
@@ -254,56 +270,74 @@ def main():
                                    Menu, compteur)
             if compteur == 1:
                 time1 = pygame.time.get_ticks()
-        elif Input and compteur == 0:
+        # sinon on le passe
+        elif Input:
             fade.set_alpha(255)
             bisfade.set_alpha(0)
             compteur += 1
             screen.fill(black)
 
+        # si 1 seconde est passé
         elif istime(time1, 1) and compteur == 1:
             compteur = fadetoblack(5, screen, [(text1, 370, 380)], [(text2, 10, 380)], Fading,
                                    Menu, compteur)
 
             if compteur == 2:
                 time1 = pygame.time.get_ticks()
-        elif Input and compteur == 1:
-            fade.set_alpha(255)
-            bisfade.set_alpha(0)
-            compteur += 1
-            screen.fill(black)
-        elif istime(time1, 1) and compteur == 2:
-            compteur = fadetoblack(5, screen, [(text2, 10, 380)],
-                                   [(font.render("Lancer jeu", False, white), 800, 400),
-                                    (font.render("Commencer", False, white), 400, 400)], Game,
-                                   Menu, compteur)
-        elif Input and compteur == 2:
-            fade.set_alpha(255)
-            bisfade.set_alpha(0)
-            compteur += 1
-            screen.fill(black)
-        if compteur == 3:
-            Fading.stateEvent = True
 
-        if compteur == 3 and Menu.stateEvent and Intro.stateEvent:
+        elif istime(time1, 1) and compteur == 2:
+            z = cadre
+            z.blit(fontletter.render("z", False, white), (35, 10))
+            charger = [(z, 164, 310), (font.render("Interagir", False, white), 150, 240), (move, 820, 276),
+                       (font.render("Bouger", False, white), 940, 240)]
+            compteur = fadetoblack(5, screen, [(text2, 10, 380)],
+                                   charger, Game,
+                                   Menu, compteur)
+
+        if istime(time1, 3) and compteur == 3:
+            maintitle = otherfont.render("RedBlaze", True, white)
+            z = cadre
+            z.blit(fontletter.render("z", False, white), (35, 10))
+            charger = [(z, 164, 310), (font.render("Interagir", False, white), 150, 240), (move, 820, 276),
+                       (font.render("Bouger", False, white), 940, 240)]
+            compteur = fadetoblack(5, screen, charger,
+                                   [(font.render("Lancer jeu", False, white), 800, 400),
+                                    (font.render("Commencer", False, white), 400, 400), (maintitle, 10, 10)], Fading,
+                                   Menu, compteur)
+            if compteur == 4:
+                time1 = pygame.time.get_ticks()
+            # sinon on le passe
+
+        if compteur == 4:
+            Fading.stateEvent = True
+        # si tous les écrans sont passés on lance le menu
+        if compteur == 4 and Menu.stateEvent and Intro.stateEvent:
             menu(font, otherfont, position, Input)
 
+        # si pas de menu et y a Fading, on lance le fading
         if Fading.stateEvent and not Menu.stateEvent:
+            maintitle = otherfont.render("RedBlaze", True, white)
             fadetoblack(5, screen, [(font.render("Lancer jeu", False, yellow), 800, 400),
-                                    (font.render("Commencer", False, white), 400, 400)],
+                                    (font.render("Commencer", False, white), 400, 400), (maintitle, 10, 10)],
                         [Bar, *decor, Pops], Fading, Menu, compteur)
+            # Sinon on quitte l'intro du jeu
             if not Fading.stateEvent:
                 Intro.stateEvent = False
         return position, compteur, time1
 
     def menu(font, otherfont, position, touch):
+        # Pour modulo nombre de choix pour le menu
         position %= 1
+        # on remplit l'écran de noir
         screen.fill(black)
+        # création du font pour l'écran titre
         maintitle = otherfont.render("RedBlaze", True, white)
-        # remplir le fond de la couleur
+        # on créait les hitbox des menus
         hitbox_lancerjeu = pygame.Rect(800, 400, 200, 50)
         hitbox_commencer = pygame.Rect(400, 400, 200, 50)
         mousepos = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()[0]
+        # si on clique et survole les hitbox on lance le jeu
         if hitbox_lancerjeu.collidepoint(mousepos[0], mousepos[1]):
             screen.blit(maintitle, (10, 10))
             screen.blit(font.render("Lancer jeu", False, yellow), (800, 400))
@@ -319,6 +353,7 @@ def main():
                 Fading.stateEvent = True
                 Menu.stateEvent = False
 
+        # Sinon les menus restent neutres
         else:
             screen.blit(maintitle, (10, 10))
             screen.blit(font.render("Lancer jeu", False, white), (800, 400))
@@ -340,12 +375,7 @@ def main():
                 else:
                     screen.blit(elt[0], (elt[1], elt[2]))
             screen.blit(fade, (0, 0))
-
-            # si la valeur alpha du noir est en dessous de 255
-
             fade.set_alpha(fade.get_alpha() + speed)
-
-            # on  active le processus inverse
         # si processus inverse activé
         elif bisfade.get_alpha() > 0 and fade.get_alpha() >= 255:
 
@@ -366,6 +396,7 @@ def main():
                 Fading.stateEvent = False
                 event.stateEvent = False
                 bisevent.stateEvent = True
+                # et on incrémente le compeutr
                 compteur += 1
                 fade.set_alpha(0)
                 bisfade.set_alpha(255)
