@@ -15,10 +15,10 @@ hspd = hmove * walkspd;
 vspd = vmove * walkspd;
 
 // Si le perso est proche d'un meuble
-if (place_meeting(x + hspd, y, oWall))
+if (place_meeting(x + hspd, y, oFurniture))
 {
 	// tant que le perso n'est pas proche du meuble au pixel près
-	while (!place_meeting(x + sign(hspd), y, oWall))
+	while (!place_meeting(x + sign(hspd), y, oFurniture))
 	{
 		// on le rapproche
 		x = x + sign(hspd)
@@ -31,9 +31,9 @@ if (place_meeting(x + hspd, y, oWall))
 x = x + hspd;
 
 // de même verticalement
-if (place_meeting(x, y + vspd, oWall))
+if (place_meeting(x, y + vspd, oFurniture))
 {
-	while (!place_meeting(x, y + sign(vspd), oWall))
+	while (!place_meeting(x, y + sign(vspd), oFurniture))
 	{
 		y = y + sign(vspd)
 	}
@@ -41,3 +41,5 @@ if (place_meeting(x, y + vspd, oWall))
 	vspd = 0
 }
 y = y + vspd;
+
+draw_self()
