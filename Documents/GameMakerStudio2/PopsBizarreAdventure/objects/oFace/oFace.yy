@@ -1,48 +1,38 @@
 {
-    "id": "e773a765-e88a-406d-8513-2ec1eeb81f40",
+    "id": "93ab8074-06dd-4efd-80a9-1877d2c33cad",
     "modelName": "GMObject",
     "mvc": "1.0",
-    "name": "oTBox",
+    "name": "oFace",
     "eventList": [
         {
-            "id": "5c3eccae-27b2-4dfa-8f99-3620d025e658",
+            "id": "4fc8fda2-7bbb-4677-a1dd-36124fb2cb42",
             "modelName": "GMEvent",
             "mvc": "1.0",
             "IsDnD": false,
             "collisionObjectId": "00000000-0000-0000-0000-000000000000",
             "enumb": 0,
             "eventtype": 0,
-            "m_owner": "e773a765-e88a-406d-8513-2ec1eeb81f40"
+            "m_owner": "93ab8074-06dd-4efd-80a9-1877d2c33cad"
         },
         {
-            "id": "a4537e8b-1bb0-4b92-9b26-4a9224edb72d",
+            "id": "36722e89-9232-4466-ac07-f61d1e85f106",
             "modelName": "GMEvent",
             "mvc": "1.0",
             "IsDnD": false,
             "collisionObjectId": "00000000-0000-0000-0000-000000000000",
             "enumb": 0,
             "eventtype": 8,
-            "m_owner": "e773a765-e88a-406d-8513-2ec1eeb81f40"
+            "m_owner": "93ab8074-06dd-4efd-80a9-1877d2c33cad"
         },
         {
-            "id": "5ceb5471-b83c-49bc-bd09-32e6cc300c26",
-            "modelName": "GMEvent",
-            "mvc": "1.0",
-            "IsDnD": false,
-            "collisionObjectId": "00000000-0000-0000-0000-000000000000",
-            "enumb": 0,
-            "eventtype": 2,
-            "m_owner": "e773a765-e88a-406d-8513-2ec1eeb81f40"
-        },
-        {
-            "id": "3afe7fa2-5804-44aa-9a0a-e46a28dfc093",
+            "id": "dd497e2c-2c23-4dc3-afd7-8dcb8c01bd53",
             "modelName": "GMEvent",
             "mvc": "1.0",
             "IsDnD": false,
             "collisionObjectId": "00000000-0000-0000-0000-000000000000",
             "enumb": 0,
             "eventtype": 3,
-            "m_owner": "e773a765-e88a-406d-8513-2ec1eeb81f40"
+            "m_owner": "93ab8074-06dd-4efd-80a9-1877d2c33cad"
         }
     ],
     "maskSpriteId": "00000000-0000-0000-0000-000000000000",
@@ -63,6 +53,6 @@
     "physicsStartAwake": true,
     "properties": null,
     "solid": false,
-    "spriteId": "18980298-f96e-438c-b170-41144bd6e7d7",
+    "spriteId": "00000000-0000-0000-0000-000000000000",
     "visible": true
 }

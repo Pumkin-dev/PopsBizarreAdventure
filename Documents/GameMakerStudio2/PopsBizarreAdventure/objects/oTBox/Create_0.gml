@@ -1,13 +1,28 @@
 /// @description 
 
-alarm[0] = 2
+c = 1;
 
-text = "Salut les kheys, j'espère que vous allez bien"
+rcount = 1;
 
-c = 1
+spaces = 0;
 
-xx = x
+box_nb = 0;
 
-rcount = 1
+sentence = "";
+words = noone
 
-alarm[1] = 0
+punctuation = false;
+
+text = "";
+
+global.obj_det = noone;
+
+x = 96;
+
+y = 512;
+
+limit = sprite_width
+
+passed_letters = ""
+
+face_pops = instance_create_layer(x, y, "Instances_3", oFacePops)

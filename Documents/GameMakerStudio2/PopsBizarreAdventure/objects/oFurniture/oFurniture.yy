@@ -1,23 +1,14 @@
 {
-    "id": "55016093-37be-48bc-aeb2-cc6191764351",
+    "id": "8c272885-bb4d-4323-b9dc-86a2ff179f31",
     "modelName": "GMObject",
     "mvc": "1.0",
     "name": "oFurniture",
     "eventList": [
-        {
-            "id": "c9f600a9-236b-4f4a-a416-f6cbd5fbd2a6",
-            "modelName": "GMEvent",
-            "mvc": "1.0",
-            "IsDnD": false,
-            "collisionObjectId": "00000000-0000-0000-0000-000000000000",
-            "enumb": 0,
-            "eventtype": 8,
-            "m_owner": "55016093-37be-48bc-aeb2-cc6191764351"
-        }
+        
     ],
     "maskSpriteId": "00000000-0000-0000-0000-000000000000",
     "overriddenProperties": null,
-    "parentObjectId": "00000000-0000-0000-0000-000000000000",
+    "parentObjectId": "55016093-37be-48bc-aeb2-cc6191764351",
     "persistent": false,
     "physicsAngularDamping": 0.1,
     "physicsDensity": 0.5,
